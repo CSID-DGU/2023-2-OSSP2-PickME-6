@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ossp_pickme/screens/Mypage.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:ossp_pickme/screens/login_screen.dart';
 import 'package:ossp_pickme/screens/share_screen.dart';
 import 'package:ossp_pickme/screens/main_screen.dart';
@@ -7,6 +7,9 @@ import 'package:ossp_pickme/screens/matching_screen.dart';
 
 
 void main() {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
   runApp(const MyApp());
 }
 
@@ -16,6 +19,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    FlutterNativeSplash.remove();
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -37,7 +41,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'PickME Home Page'),
     );
   }
 }

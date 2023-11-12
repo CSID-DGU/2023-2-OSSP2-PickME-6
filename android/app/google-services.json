@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "178007127464",
+    "project_id": "ossp2-pickme-6",
+    "storage_bucket": "ossp2-pickme-6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:178007127464:android:fdb0376f3ff5d82968999d",
+        "android_client_info": {
+          "package_name": "com.example.ossp_pickme"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6Yr6da4f4FddMJNSwbHmwNVhWJs21fnw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

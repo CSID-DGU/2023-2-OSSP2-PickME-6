@@ -4,10 +4,13 @@ import 'package:ossp_pickme/screens/login_screen.dart';
 import 'package:ossp_pickme/screens/share_screen.dart';
 import 'package:ossp_pickme/screens/main_screen.dart';
 import 'package:ossp_pickme/screens/matching_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 
-void main() {
+void main() async{
+
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  Firebase.initializeApp();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   runApp(const MyApp());
@@ -62,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
+
       bottomNavigationBar: BottomNavigationBar(
         onTap: (index) {
           setState(() {

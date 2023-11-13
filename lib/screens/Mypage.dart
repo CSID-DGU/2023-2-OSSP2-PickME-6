@@ -1,81 +1,6 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  var _index = 0;
-  var _pages = [
-    Page1(),
-    Page2(),
-    Page3(),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Text(
-          '마이페이지',
-          style: TextStyle(color: Colors.black),
-        ),
-        centerTitle: true,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.add,
-              color: Colors.black,
-            ),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: _pages[_index],
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) {
-          setState(() {
-            _index = index;
-          });
-        },
-        currentIndex: _index,
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            label: 'Home',
-            icon: Icon(Icons.home),
-          ),
-          BottomNavigationBarItem(
-            label: 'Matching',
-            icon: Icon(Icons.people),
-          ),
-          BottomNavigationBarItem(
-            label: 'My Page',
-            icon: Icon(Icons.account_circle),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class Page3 extends StatelessWidget {
+class MyInfoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -370,28 +295,6 @@ class Page3 extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class Page2 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'maching',
-        style: TextStyle(fontSize: 40),
-      ),
-    );
-  }
-}
-
-class Page1 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      'Home',
-      style: TextStyle(fontSize: 40),
     );
   }
 }

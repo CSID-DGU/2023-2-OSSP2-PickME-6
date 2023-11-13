@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:ossp_pickme/screens/login_screen.dart';
-import 'package:ossp_pickme/screens/share_screen.dart';
+import 'package:ossp_pickme/screens/Mypage.dart';
 import 'package:ossp_pickme/screens/main_screen.dart';
 import 'package:ossp_pickme/screens/matching_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -41,7 +40,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var _index = 0;
+  int _index = 0;
+  
+  final List<Widget> _pages = [
+      const HomePage(),
+      const MatchingPage(),
+      MyInfoPage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
+      body: _pages[_index],
       bottomNavigationBar: BottomNavigationBar(
         onTap: (index) {
           setState(() {
@@ -73,15 +79,15 @@ class _MyHomePageState extends State<MyHomePage> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             label: 'Home',
-            icon: Icon(Icons.home),
+            icon: Icon(_index==0 ? Icons.home : Icons.home_outlined),
           ),
           BottomNavigationBarItem(
             label: 'Matching',
-            icon: Icon(Icons.people),
+            icon: Icon(_index==1 ? Icons.people : Icons.people_outlined),
           ),
           BottomNavigationBarItem(
             label: 'My Page',
-            icon: Icon(Icons.account_circle),
+            icon: Icon(_index==2 ? Icons.account_circle : Icons.account_circle_outlined),
           ),
         ],
       ),

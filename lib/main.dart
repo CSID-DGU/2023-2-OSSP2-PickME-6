@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:ossp_pickme/screens/Mypage.dart';
-import 'package:ossp_pickme/screens/main_screen.dart';
-import 'package:ossp_pickme/screens/matching_screen.dart';
+import 'package:ossp_pickme/pages/MyInfo_page.dart';
+import 'package:ossp_pickme/pages/Home_page.dart';
+import 'package:ossp_pickme/pages/Match_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async{

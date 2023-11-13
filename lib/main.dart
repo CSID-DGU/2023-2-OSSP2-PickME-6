@@ -45,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<Widget> _pages = [
       const HomePage(),
       const MatchingPage(),
-      MyInfoPage(),
+      const MyInfoPage(),
   ];
 
   @override

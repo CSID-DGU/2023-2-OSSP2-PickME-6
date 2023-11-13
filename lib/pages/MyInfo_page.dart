@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 
-class MyInfoPage extends StatelessWidget {
+class MyInfoPage extends StatefulWidget {
+  const MyInfoPage({Key? key}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() =>_MyInfoState();
+
+}
+
+class _MyInfoState extends State<MyInfoPage> {
   @override
   Widget build(BuildContext context) {
     return ListView(

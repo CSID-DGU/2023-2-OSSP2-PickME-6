@@ -6,9 +6,7 @@ import 'package:ossp_pickme/screens/main_screen.dart';
 import 'package:ossp_pickme/screens/matching_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-
 void main() async{
-
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   Firebase.initializeApp();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -51,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(
-          '배달비 공유',
+          '배달비 공유 앱',
           style: TextStyle(color: Colors.black),
         ),
         centerTitle: true,
@@ -65,7 +63,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-
       bottomNavigationBar: BottomNavigationBar(
         onTap: (index) {
           setState(() {

@@ -26,16 +26,16 @@ class _MyInfoState extends State<MyInfoPage> {
         children: <Widget>[
           Positioned(
             child: Container(
-              width: 450,
-              height: 200,
+              width: 368.17,
+              height: 194,
               child: Stack(
                 children: [
                   Positioned(
                     left: 0,
                     top: 0,
                     child: Container(
-                      width: 450,
-                      height: 200,
+                      width: 360,
+                      height: 194,
                       decoration: ShapeDecoration(
                         color: Colors.white,
                         shape: RoundedRectangleBorder(
@@ -53,8 +53,8 @@ class _MyInfoState extends State<MyInfoPage> {
                     ),
                   ),
                   Positioned(
-                    left: 160,
-                    top: 30,
+                    left: 111,
+                    top: 17.39,
                     child: SizedBox(
                       width: 257.17,
                       height: 30,
@@ -72,8 +72,8 @@ class _MyInfoState extends State<MyInfoPage> {
                     ),
                   ),
                   Positioned(
-                    left: 160,
-                    top: 100,
+                    left: 111,
+                    top: 71.80,
                     child: SizedBox(
                       width: 135,
                       height: 25,
@@ -91,11 +91,11 @@ class _MyInfoState extends State<MyInfoPage> {
                     ),
                   ),
                   Positioned(
-                    left: 160,
-                    top: 75,
+                    left: 111,
+                    top: 46.84,
                     child: SizedBox(
                       width: 92.28,
-                      height: 30,
+                      height: 20,
                       child: Text(
                         '실명',
                         style: TextStyle(
@@ -110,8 +110,8 @@ class _MyInfoState extends State<MyInfoPage> {
                     ),
                   ),
                   Positioned(
-                    left: 50,
-                    top: 70,
+                    left: 22,
+                    top: 50,
                     child: SizedBox(
                       width: 80,
                       height: 80,
@@ -130,7 +130,7 @@ class _MyInfoState extends State<MyInfoPage> {
                     ),
                   ),
                   Positioned(
-                    left: 225,
+                    left: 180.57,
                     top: 181.60,
                     child: Transform(
                       transform: Matrix4.identity()
@@ -151,10 +151,10 @@ class _MyInfoState extends State<MyInfoPage> {
                     ),
                   ),
                   Positioned(
-                    left: 90,
+                    left: 69,
                     top: 156,
                     child: SizedBox(
-                      width: 100,
+                      width: 71.77,
                       height: 25,
                       child: Text(
                         '주문내역',
@@ -170,7 +170,7 @@ class _MyInfoState extends State<MyInfoPage> {
                     ),
                   ),
                   Positioned(
-                    left: 310,
+                    left: 234.54,
                     top: 156.53,
                     child: SizedBox(
                       width: 92.28,
@@ -202,8 +202,8 @@ class _MyInfoState extends State<MyInfoPage> {
       children: [
         Positioned(
           child: SizedBox(
-            width: 420,
-            height: 45,
+            width: 321,
+            height: 40,
             child: Text(
               '문의하기',
               style: TextStyle(
@@ -219,8 +219,8 @@ class _MyInfoState extends State<MyInfoPage> {
         ),
         Positioned(
           child: SizedBox(
-            width: 420,
-            height: 45,
+            width: 321,
+            height: 40,
             child: Text(
               '비밀번호 변경',
               style: TextStyle(
@@ -236,8 +236,8 @@ class _MyInfoState extends State<MyInfoPage> {
         ),
         Positioned(
           child: SizedBox(
-            width: 420,
-            height: 45,
+            width: 321,
+            height: 40,
             child: Text(
               '프로필 이미지 변경',
               style: TextStyle(
@@ -253,8 +253,8 @@ class _MyInfoState extends State<MyInfoPage> {
         ),
         Positioned(
           child: SizedBox(
-            width: 420,
-            height: 45,
+            width: 321,
+            height: 40,
             child: Text(
               '닉네임 설정',
               style: TextStyle(
@@ -270,8 +270,8 @@ class _MyInfoState extends State<MyInfoPage> {
         ),
         Positioned(
           child: SizedBox(
-            width: 420,
-            height: 45,
+            width: 321,
+            height: 40,
             child: Text(
               '로그아웃',
               style: TextStyle(
@@ -287,8 +287,8 @@ class _MyInfoState extends State<MyInfoPage> {
         ),
         Positioned(
           child: SizedBox(
-            width: 420,
-            height: 45,
+            width: 321,
+            height: 40,
             child: Text(
               '회원탈퇴',
               style: TextStyle(

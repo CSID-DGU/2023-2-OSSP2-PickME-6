@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:ossp_pickme/pages/Chat_page.dart';
 import 'package:ossp_pickme/pages/MyInfo_page.dart';
 import 'package:ossp_pickme/pages/Home_page.dart';
 import 'package:ossp_pickme/pages/Match_page.dart';
@@ -45,6 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<Widget> _pages = [
       const HomePage(),
       const MatchingPage(),
+      const ChatPage(),
       const MyInfoPage(),
   ];
 
@@ -70,6 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: _pages[_index],
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         onTap: (index) {
           setState(() {
             _index = index;
@@ -85,9 +88,13 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Matching',
             icon: Icon(_index==1 ? Icons.people : Icons.people_outlined),
           ),
+           BottomNavigationBarItem(
+            label: 'Chat',
+            icon: Icon(_index==2 ? Icons.chat : Icons.chat_outlined),
+          ),
           BottomNavigationBarItem(
             label: 'My Page',
-            icon: Icon(_index==2 ? Icons.account_circle : Icons.account_circle_outlined),
+            icon: Icon(_index==3 ? Icons.account_circle : Icons.account_circle_outlined),
           ),
         ],
       ),

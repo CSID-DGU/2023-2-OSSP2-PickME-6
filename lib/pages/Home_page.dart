@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import '../menu/KoreanFood.dart';
+import '../menu/ChineseFood.dart';
+import '../menu/JapaneseFood.dart';
+import '../menu/Snack.dart';
+import '../menu/WesternFood.dart';
+import '../menu/etcFood.dart';
+
 
 class HomePage extends StatefulWidget {
 const HomePage({Key? key}) : super(key: key);
@@ -97,6 +104,115 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     ),
+    //메뉴 첫번째 줄 : 한식, 중식, 일식
+    Row(
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => KoreanFood()),
+                        );
+                    }, 
+                    icon: Icon(Icons.food_bank),
+                    iconSize: 40, 
+                  ),
+                    Text('한식'),
+                  ],
+                ),
+                Column(
+                  children: <Widget>[
+                    IconButton(
+                    onPressed: () {
+                       Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => ChineseFood()),
+                        );
+                    }, 
+                    icon: Icon(Icons.food_bank),
+                    iconSize: 40, 
+                  ),
+                    Text('중식'),
+                  ],
+                ),
+                Column(
+                children: <Widget>[
+                  IconButton(
+                    onPressed: () {
+                       Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => JapaneseFood()),
+                        );
+                    }, 
+                    icon: Icon(Icons.food_bank),
+                    iconSize: 40, 
+                  ),
+                  Text('일식'),
+                ],
+              ),
+
+
+            ],
+          ),
+          SizedBox(
+            height: 20,
+          ),
+      //메뉴 두번째 줄 : 양식, 분식, 기타
+      Row(
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    IconButton(
+                    onPressed: () {
+                       Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => WesternFood()),
+                        );
+                    }, 
+                    icon: Icon(Icons.food_bank),
+                    iconSize: 40, 
+                  ),
+                    Text('양식'),
+                  ],
+                ),
+                Column(
+                  children: <Widget>[
+                    IconButton(
+                    onPressed: () {
+                       Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => Snack()),
+                        );
+                    }, 
+                    icon: Icon(Icons.food_bank),
+                    iconSize: 40, 
+                  ),
+                    Text('분식'),
+                  ],
+                ),
+                Column(
+                children: <Widget>[
+                  IconButton(
+                    onPressed: () {
+                       Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => etcFood()),
+                        );
+                    }, 
+                    icon: Icon(Icons.food_bank),
+                    iconSize: 40, 
+                  ),
+                  Text('기타'),
+                ],
+              ),
+            ],
+          ),
+        //메뉴 버튼 끝
+
    ],
    ),
    );

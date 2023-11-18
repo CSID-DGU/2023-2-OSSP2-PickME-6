@@ -8,8 +8,11 @@ import 'package:ossp_pickme/pages/Match_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async{
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+
+
   Firebase.initializeApp();
+
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   runApp(const MyApp());
@@ -59,7 +62,8 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('PickME'),
         centerTitle: true,
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.notifications)),
+          IconButton(onPressed: () {}, 
+                    icon: Icon(Icons.notifications)),
         ],
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,

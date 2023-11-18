@@ -1,3 +1,5 @@
+// import 'dart:html';
+
 import 'package:flutter/material.dart';
 import '../menu/KoreanFood.dart';
 import '../menu/ChineseFood.dart';
@@ -5,6 +7,17 @@ import '../menu/JapaneseFood.dart';
 import '../menu/Snack.dart';
 import '../menu/WesternFood.dart';
 import '../menu/etcFood.dart';
+//광고 슬라이더 작성 패키지
+import 'package:carousel_slider/carousel_slider.dart';
+
+//광고 이미지
+final dummyItems = [
+  'https://cdn.pixabay.com/photo/2016/03/23/15/00/ice-cream-1274894_1280.jpg',
+  'https://cdn.pixabay.com/photo/2022/01/05/15/22/man-6917326_1280.jpg',
+  'https://cdn.pixabay.com/photo/2017/08/03/21/48/drinks-2578446_1280.jpg',
+];
+
+
 
 
 class HomePage extends StatefulWidget {
@@ -153,10 +166,9 @@ class _HomePageState extends State<HomePage> {
                   Text('일식'),
                 ],
               ),
-
-
             ],
           ),
+          //여백 주기
           SizedBox(
             height: 20,
           ),
@@ -212,9 +224,38 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         //메뉴 버튼 끝
-
+        //여백 주기
+          SizedBox( 
+            height: 80,
+          ),
+          //광고 슬라이더
+          CarouselSlider(
+            options: CarouselOptions(
+              height: 150,
+              autoPlay: true,
+              ),
+             items: dummyItems.map((url) {
+        return Builder(
+          builder: (BuildContext context) {
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              margin: EdgeInsets.symmetric(horizontal: 5.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: Image.network(
+                  url,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            );
+          },
+        );
+      }).toList(),
+    ),
+    //광고 슬라이더 끝
    ],
    ),
    );
   }
 }
+

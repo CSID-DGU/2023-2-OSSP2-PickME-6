@@ -22,7 +22,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     FlutterNativeSplash.remove();
     return MaterialApp(
-      title: 'PickME Demo',
+      title: 'PickME',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
                primarySwatch: Colors.blue,
       ),
@@ -54,21 +55,14 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Text(
-          '배달비 공유 앱',
-          style: TextStyle(color: Colors.black),
-        ),
+        title: Text('PickME'),
         centerTitle: true,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.add,
-              color: Colors.black,
-            ),
-            onPressed: () {},
-          ),
+        actions: [
+          IconButton(onPressed: () {}, icon: Icon(Icons.notifications)),
         ],
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        elevation: 1,
       ),
       body: _pages[_index],
       bottomNavigationBar: BottomNavigationBar(

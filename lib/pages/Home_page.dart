@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.all(30),
         ),
     Container(
-      color: Colors.black, 
+      color: Colors.white, 
       padding: EdgeInsets.fromLTRB(5, 10, 5, 10),
       child: Row(
         children: <Widget>[
@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
                             },
                           )
                            : Container(),
-                           hintText: '검색하세요',
+                           hintText: 'Search For Food',
                            labelStyle: TextStyle(color: Colors.white),
                            focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.transparent),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-
+import 'package:ossp_pickme/chatting/chat/messages.dart';
 
 class ChatPage extends StatefulWidget {
 const ChatPage({Key? key}) : super(key: key);
@@ -15,8 +14,6 @@ class _ChatState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Container(
 
-
-      
     );
   }
 

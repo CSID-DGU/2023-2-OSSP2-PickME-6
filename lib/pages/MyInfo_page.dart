@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:ossp_pickme/pages/MatchRecord_page.dart';
+import 'package:ossp_pickme/pages/Login_page.dart';
 
 class MyInfoPage extends StatefulWidget {
   const MyInfoPage({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() =>_MyInfoState();
-
 }
 
 class _MyInfoState extends State<MyInfoPage> {
   @override
+  final List<Widget> _pages = [
+    const MatchRecord(),
+    const LoginPage(),
+  ];
+
   Widget build(BuildContext context) {
     return ListView(
       children: <Widget>[
@@ -153,18 +159,26 @@ class _MyInfoState extends State<MyInfoPage> {
                   Positioned(
                     left: 69,
                     top: 156,
-                    child: SizedBox(
-                      width: 71.77,
-                      height: 25,
-                      child: Text(
-                        '주문내역',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          height: 0,
-                          letterSpacing: -0.30,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => MatchRecord()),
+                        );
+                      },
+                      child: SizedBox(
+                        width: 71.77,
+                        height: 25,
+                        child: Text(
+                         '주문내역',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            height: 0,
+                            letterSpacing: -0.30,
+                          ),
                         ),
                       ),
                     ),
@@ -269,18 +283,26 @@ class _MyInfoState extends State<MyInfoPage> {
           ),
         ),
         Positioned(
-          child: SizedBox(
-            width: 321,
-            height: 40,
-            child: Text(
-              '로그아웃',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 15,
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                height: 0,
-                letterSpacing: -0.33,
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => LoginPage()),
+              );
+            },
+            child: SizedBox(
+              width: 321,
+              height: 40,
+              child: Text(
+                '로그아웃',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  height: 0,
+                  letterSpacing: -0.33,
+                ),
               ),
             ),
           ),

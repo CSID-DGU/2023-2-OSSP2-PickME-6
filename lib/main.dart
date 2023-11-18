@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:ossp_pickme/chatting/chat/chat_screen.dart';
 import 'package:ossp_pickme/pages/Chat_page.dart';
 import 'package:ossp_pickme/pages/MyInfo_page.dart';
 import 'package:ossp_pickme/pages/Home_page.dart';

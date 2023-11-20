@@ -20,33 +20,87 @@ class MatchRecord extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          MatchingRecord(),
-          MatchingRecord(),
-          MatchingRecord(),
-          MatchingRecord(),
+          AdvertisementItem(),
+          MatchingRecord(
+            date: '11. 15(수) · 배달완료',
+            image: '이미지',
+            restaurantName: '라화방마라탕',
+            menuName: '마라탕 1개 + 마라샹궈 1개 + 코카콜라제로 2개',
+          ),
+          MatchingRecord(
+            date: '11. 12(일) · 배달완료',
+            image: '이미지',
+            restaurantName: '동국반점',
+            menuName: '해오름세트',
+          ),
+          MatchingRecord(
+            date: '11. 8(수) · 배달완료',
+            image: '이미지',
+            restaurantName: '행복은간장밥',
+            menuName: '행복한 싱글 SET 1개',
+          ),
+          MatchingRecord(
+            date: '11. 4(토) · 배달완료',
+            image: '이미지',
+            restaurantName: '필동반점',
+            menuName: '간짜장 1개 + 차돌짬뽕 2개',
+          ),
+          MatchingRecord(
+            date: '10. 30(월) · 배달완료',
+            image: '이미지',
+            restaurantName: '동국반점',
+            menuName: 'A세트 1개',
+          ),
         ],
       ),
     );
   }
 }
 
+class AdvertisementItem extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.all(8.0),
+      padding: EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: Colors.grey,
+          width: 1.0,
+        ),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      alignment: Alignment.center,
+      child: Text('광고'),
+    );
+  }
+}
+
 class MatchingRecord extends StatelessWidget {
+  final String date;
+  final String image;
+  final String restaurantName;
+  final String menuName;
+
+  const MatchingRecord({
+    required this.date,
+    required this.image,
+    required this.restaurantName,
+    required this.menuName,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Container(
-          //width: 360,
-          //height: 640,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(color: Colors.white),
           child: Stack(
             children: [
               Positioned(
-                //left: 0,
-                //top: 148,
                 child: Container(
-                  width: 360,
                   height: 130,
                   clipBehavior: Clip.antiAlias,
                   decoration: ShapeDecoration(
@@ -62,7 +116,7 @@ class MatchingRecord extends StatelessWidget {
                           width: 103,
                           height: 16,
                           child: Text(
-                            '11. 3(금) · 배달완료',
+                            date,
                             style: TextStyle(
                               color: Colors.black.withOpacity(0.20000000298023224),
                               fontSize: 11,
@@ -81,7 +135,7 @@ class MatchingRecord extends StatelessWidget {
                           width: 80,
                           height: 80,
                           child: Text(
-                            '이미지',
+                            image,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.black,
@@ -101,7 +155,7 @@ class MatchingRecord extends StatelessWidget {
                           width: 110,
                           height: 20,
                           child: Text(
-                            '음식점 이름',
+                            restaurantName,
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 11,
@@ -117,10 +171,10 @@ class MatchingRecord extends StatelessWidget {
                         left: 108,
                         top: 63,
                         child: SizedBox(
-                          width: 110,
+                          //width: 110,
                           height: 15,
                           child: Text(
-                            '메뉴명',
+                            menuName,
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 9,

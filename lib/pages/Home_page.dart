@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import '../menu/KoreanFood.dart';
 import '../menu/ChineseFood.dart';
@@ -14,8 +16,6 @@ final dummyItems = [
   'https://cdn.pixabay.com/photo/2022/01/05/15/22/man-6917326_1280.jpg',
   'https://cdn.pixabay.com/photo/2017/08/03/21/48/drinks-2578446_1280.jpg',
 ];
-
-
 
 
 class HomePage extends StatefulWidget {
@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
       children: <Widget>[
         Container(
           width: MediaQuery.of(context).size.width,
-          height: 150,
+          height: 100,
           decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10.0),
           image: DecorationImage(
@@ -66,18 +66,15 @@ class _HomePageState extends State<HomePage> {
           child: Text(
             '메뉴 추천 받기',
             style: TextStyle(
-              fontSize: 40,
+              fontSize: 30,
               color: const Color.fromARGB(255, 255, 255, 255),
               letterSpacing: 3.0,
             ),
             ),
           ),
       ],
-
     ),
-        // Padding(
-        //   padding: EdgeInsets.all(30),
-        // ),
+    //랜덤 메뉴 추천 끝
     //검색창
     Container(
       color: Colors.white, 
@@ -294,6 +291,13 @@ class _HomePageState extends State<HomePage> {
   }
   
   random_menu() {
+
+    List<String> _menus = [
+     '한식',
+     '중식',
+     '양식',
+  ];
+
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -317,8 +321,14 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             actions: <Widget>[
-              new TextButton(
-                child: new Text("확인"),
+              TextButton(
+                child: Text("다른 메뉴"),
+                onPressed: () {
+                  
+                },
+              ),
+              TextButton(
+                child: Text("확인"),
                 onPressed: () {
                   Navigator.pop(context);
                 },

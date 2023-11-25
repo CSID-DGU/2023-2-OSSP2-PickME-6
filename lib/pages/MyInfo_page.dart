@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ossp_pickme/pages/MatchRecord_page.dart';
 import 'package:ossp_pickme/pages/Login_page.dart';
+import 'package:ossp_pickme/pages/Inquiry_page.dart';
 
 class MyInfoPage extends StatefulWidget {
   const MyInfoPage({Key? key}) : super(key: key);
@@ -33,12 +34,12 @@ class _MyInfoState extends State<MyInfoPage> {
           Positioned(
             child: Container(
               width: 368.17,
-              height: 194,
+              //height: 194,
               child: Stack(
                 children: [
                   Positioned(
-                    left: 0,
-                    top: 0,
+                    //left: 0,
+                    //top: 0,
                     child: Container(
                       width: 360,
                       height: 194,
@@ -215,18 +216,27 @@ class _MyInfoState extends State<MyInfoPage> {
     return Column(
       children: [
         Positioned(
-          child: SizedBox(
-            width: 321,
-            height: 40,
-            child: Text(
-              '문의하기',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 15,
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                height: 0,
-                letterSpacing: -0.33,
+          child: InkWell(
+            onTap: () {
+              // 문의하기 버튼을 눌렀을 때 InquiryPage로 이동
+              Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => InquiryPage()),
+              );
+            },
+            child: SizedBox(
+              width: 321,
+              height: 40,
+              child: Text(
+                '문의하기',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  height: 0,
+                  letterSpacing: -0.33,
+                ),
               ),
             ),
           ),
@@ -308,23 +318,61 @@ class _MyInfoState extends State<MyInfoPage> {
           ),
         ),
         Positioned(
-          child: SizedBox(
-            width: 321,
-            height: 40,
-            child: Text(
-              '회원탈퇴',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 15,
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                height: 0,
-                letterSpacing: -0.33,
+          child: InkWell(
+            onTap: () {
+              // 회원 탈퇴 팝업창 띄우기
+              _showConfirmationDialog();
+            },
+            child: SizedBox(
+              width: 321,
+              height: 40,
+              child: Text(
+                '회원탈퇴',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  height: 0,
+                  letterSpacing: -0.33,
+                ),
               ),
             ),
           ),
         ),
       ],
+    );
+  }
+  // 회원 탈퇴 확인 팝업창
+  Future<void> _showConfirmationDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('회원 탈퇴'),
+          content: Text('정말 탈퇴하시겠습니까?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // 취소 버튼
+                Navigator.of(context).pop();
+              },
+              child: Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+                // 확인 버튼
+                // 로그인 화면으로 이동
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+              },
+              child: Text('확인'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

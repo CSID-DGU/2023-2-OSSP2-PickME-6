@@ -6,15 +6,14 @@ import 'package:ossp_pickme/pages/MyInfo_page.dart';
 import 'package:ossp_pickme/pages/Home_page.dart';
 import 'package:ossp_pickme/pages/Match_page.dart';
 import 'package:firebase_core/firebase_core.dart';
-
+import 'firebase_options.dart';
 
 void main() async{
-
-
-  Firebase.initializeApp();
-
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(const MyApp());
 }

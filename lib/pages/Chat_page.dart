@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ossp_pickme/main.dart';
 import 'dart:async';
 
 import '../chatting/chat/chat_screen.dart';
@@ -156,9 +157,10 @@ class ChatRoomListItem extends StatelessWidget {
       ),
       trailing: ElevatedButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ChatScreen()),
+          navigatorKey.currentState?.push(
+            MaterialPageRoute(
+              builder: (context) => const ChatScreen(),
+            ),
           );
         },
         child: Text('입장'),

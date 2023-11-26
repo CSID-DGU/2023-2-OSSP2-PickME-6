@@ -1,4 +1,4 @@
-// import 'dart:html';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import '../menu/KoreanFood.dart';
@@ -16,8 +16,6 @@ final dummyItems = [
   'https://cdn.pixabay.com/photo/2022/01/05/15/22/man-6917326_1280.jpg',
   'https://cdn.pixabay.com/photo/2017/08/03/21/48/drinks-2578446_1280.jpg',
 ];
-
-
 
 
 class HomePage extends StatefulWidget {
@@ -46,9 +44,38 @@ class _HomePageState extends State<HomePage> {
    return Container(
     child: Column(
       children: <Widget>[
-        Padding(
-          padding: EdgeInsets.all(30),
+    //랜덤 메뉴 추천
+    Stack(
+      alignment: Alignment.center,
+      children: <Widget>[
+        Container(
+          width: MediaQuery.of(context).size.width,
+          height: 100,
+          decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.0),
+          image: DecorationImage(
+            image: AssetImage(
+              'menu.png'
+            ),
+            fit: BoxFit.cover,
+            )
+          ),
         ),
+        TextButton(
+          onPressed: () => random_menu(), 
+          child: Text(
+            '메뉴 추천 받기',
+            style: TextStyle(
+              fontSize: 30,
+              color: const Color.fromARGB(255, 255, 255, 255),
+              letterSpacing: 3.0,
+            ),
+            ),
+          ),
+      ],
+    ),
+    //랜덤 메뉴 추천 끝
+    //검색창
     Container(
       color: Colors.white, 
       padding: EdgeInsets.fromLTRB(5, 10, 5, 10),
@@ -117,6 +144,11 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     ),
+    //검색창 끝
+    //여백 주기
+          SizedBox(
+            height: 20,
+          ),
     //메뉴 첫번째 줄 : 한식, 중식, 일식
     Row(
     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -226,7 +258,7 @@ class _HomePageState extends State<HomePage> {
         //메뉴 버튼 끝
         //여백 주기
           SizedBox( 
-            height: 80,
+            height: 40,
           ),
           //광고 슬라이더
           CarouselSlider(
@@ -256,6 +288,54 @@ class _HomePageState extends State<HomePage> {
    ],
    ),
    );
+  }
+  
+  random_menu() {
+
+    List<String> _menus = [
+     '한식',
+     '중식',
+     '양식',
+  ];
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            //Dialog Main Title
+            title: Column(
+              children: <Widget>[
+                new Text("메뉴 추천"),
+              ],
+            ),
+            //
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  "한식",
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text("다른 메뉴"),
+                onPressed: () {
+                  
+                },
+              ),
+              TextButton(
+                child: Text("확인"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
   }
 }
 

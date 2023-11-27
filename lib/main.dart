@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:ossp_pickme/chatting/chat/chat_screen.dart';
 import 'package:ossp_pickme/pages/Chat_page.dart';
+import 'package:ossp_pickme/pages/Login_page.dart';
 import 'package:ossp_pickme/pages/MyInfo_page.dart';
 import 'package:ossp_pickme/pages/Home_page.dart';
 import 'package:ossp_pickme/pages/Match_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async{
@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
                primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'PickME Home Page'),
+      home: const LoginPage(),
     );
   }
 }

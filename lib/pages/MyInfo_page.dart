@@ -1,8 +1,9 @@
+
 import 'package:flutter/material.dart';
 import 'package:ossp_pickme/pages/MatchRecord_page.dart';
 import 'package:ossp_pickme/pages/Login_page.dart';
 import 'package:ossp_pickme/pages/Inquiry_page.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 class MyInfoPage extends StatefulWidget {
   const MyInfoPage({Key? key}) : super(key: key);
 
@@ -11,6 +12,8 @@ class MyInfoPage extends StatefulWidget {
 }
 
 class _MyInfoState extends State<MyInfoPage> {
+  final _authentication = FirebaseAuth.instance;
+
   @override
   final List<Widget> _pages = [
     const MatchRecord(),
@@ -295,10 +298,8 @@ class _MyInfoState extends State<MyInfoPage> {
         Positioned(
           child: InkWell(
             onTap: () {
-              Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => LoginPage()),
-              );
+              _authentication.signOut();
+              Navigator.pop(context);
             },
             child: SizedBox(
               width: 321,
@@ -362,6 +363,8 @@ class _MyInfoState extends State<MyInfoPage> {
             TextButton(
               onPressed: () {
                 // 확인 버튼
+                User? user = _authentication.currentUser;
+                user!.delete();
                 // 로그인 화면으로 이동
                 Navigator.pushReplacement(
                   context,

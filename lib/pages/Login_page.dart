@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ossp_pickme/pages/SignUp_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ossp_pickme/main.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -11,6 +13,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final _authentication = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -59,8 +62,33 @@ class _LoginPageState extends State<LoginPage> {
             // 로그인 버튼
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                // 로그인 버튼 클릭 -> 코드
+              onPressed: () async {
+                try{
+                  final newUser =
+                      await _authentication.signInWithEmailAndPassword(
+                      email: _idController.text,
+                      password: _passwordController.text
+                  );
+                  if (newUser.user != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) {
+                        return MyHomePage(
+                          title: 'PickME',
+                        );
+                      }),
+                    );
+                  }
+                }catch(e){
+                  print(e);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content:
+                      Text('존재하지 않는 아이디나 비밀번호입니다.'),
+                      backgroundColor: Colors.blue,
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF2B4177), // 버튼색

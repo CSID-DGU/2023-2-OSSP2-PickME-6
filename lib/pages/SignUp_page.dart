@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
+import '../main.dart';
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
 
@@ -14,6 +17,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _confirmPasswordController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _verificationCodeController = TextEditingController();
+  final _authentication = FirebaseAuth.instance;
 
   bool _isIdAvailable = true; // 아이디 중복 확인 결과 (일단 true로 초기화)
 
@@ -103,8 +107,33 @@ class _SignUpPageState extends State<SignUpPage> {
             SizedBox(height: 20),
             // 회원가입 버튼
             ElevatedButton(
-              onPressed: () {
-                // 회원가입 버튼 눌렀을 때 코드
+              onPressed: () async{
+                try {
+                  final newUser = await _authentication
+                      .createUserWithEmailAndPassword(
+                    email: _phoneNumberController.text,
+                    password: _passwordController.text,
+                  );
+                  if(newUser.user!=null){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context){
+                        return MyHomePage(
+                          title: 'PickME',
+                        );
+                      }),
+                    );
+                  }
+                }catch(e){
+                  print(e);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content:
+                        Text('올바르지 않은 아이디나 패스워드 형식입니다.'),
+                        backgroundColor: Colors.blue,
+                      ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF2B4177),

@@ -1,9 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:ossp_pickme/pages/MatchRecord_page.dart';
 import 'package:ossp_pickme/pages/Login_page.dart';
 import 'package:ossp_pickme/pages/Inquiry_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 class MyInfoPage extends StatefulWidget {
   const MyInfoPage({Key? key}) : super(key: key);
 
@@ -13,6 +13,8 @@ class MyInfoPage extends StatefulWidget {
 
 class _MyInfoState extends State<MyInfoPage> {
   final _authentication = FirebaseAuth.instance;
+  String _nickName = '닉네임'; // 닉네임 초기값 설정
+  String _profileImage = 'assets/silhouette_image.jpg'; // 기본 이미지 경로
 
   @override
   final List<Widget> _pages = [
@@ -63,8 +65,8 @@ class _MyInfoState extends State<MyInfoPage> {
                     ),
                   ),
                   Positioned(
-                    left: 111,
-                    top: 17.39,
+                    left: 120,
+                    top: 27.39,
                     child: SizedBox(
                       width: 257.17,
                       height: 30,
@@ -82,13 +84,13 @@ class _MyInfoState extends State<MyInfoPage> {
                     ),
                   ),
                   Positioned(
-                    left: 111,
-                    top: 71.80,
+                    left: 120,
+                    top: 81.80,
                     child: SizedBox(
                       width: 135,
                       height: 25,
                       child: Text(
-                        '동국대 서울캠 00학번',
+                        '동국대 서울캠퍼스',
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 14,
@@ -101,8 +103,8 @@ class _MyInfoState extends State<MyInfoPage> {
                     ),
                   ),
                   Positioned(
-                    left: 111,
-                    top: 46.84,
+                    left: 120,
+                    top: 56.84,
                     child: SizedBox(
                       width: 92.28,
                       height: 20,
@@ -121,21 +123,12 @@ class _MyInfoState extends State<MyInfoPage> {
                   ),
                   Positioned(
                     left: 22,
-                    top: 50,
-                    child: SizedBox(
+                    top: 30,
+                    child: SizedBox(  // 이미지
                       width: 80,
                       height: 80,
-                      child: Text(
-                        '이미지',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 12,
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          height: 0,
-                          letterSpacing: -0.30,
-                        ),
+                      child: CircleAvatar(
+                        backgroundImage: AssetImage(_profileImage),
                       ),
                     ),
                   ),
@@ -174,7 +167,7 @@ class _MyInfoState extends State<MyInfoPage> {
                         width: 71.77,
                         height: 25,
                         child: Text(
-                         '주문내역',
+                          '주문내역',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 14,
@@ -223,8 +216,8 @@ class _MyInfoState extends State<MyInfoPage> {
             onTap: () {
               // 문의하기 버튼을 눌렀을 때 InquiryPage로 이동
               Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => InquiryPage()),
+                context,
+                MaterialPageRoute(builder: (context) => InquiryPage()),
               );
             },
             child: SizedBox(
@@ -245,52 +238,68 @@ class _MyInfoState extends State<MyInfoPage> {
           ),
         ),
         Positioned(
-          child: SizedBox(
-            width: 321,
-            height: 40,
-            child: Text(
-              '비밀번호 변경',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 15,
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                height: 0,
-                letterSpacing: -0.33,
+          child: InkWell(
+            onTap: () {
+              // 비밀번호 변경 버튼을 눌렀을 때 비밀번호 변경 창으로 이동
+              _showChangePasswordDialog();
+            },
+            child: SizedBox(
+              width: 321,
+              height: 40,
+              child: Text(
+                '비밀번호 변경',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  height: 0,
+                  letterSpacing: -0.33,
+                ),
               ),
             ),
           ),
         ),
         Positioned(
-          child: SizedBox(
-            width: 321,
-            height: 40,
-            child: Text(
-              '프로필 이미지 변경',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 15,
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                height: 0,
-                letterSpacing: -0.33,
+          child: InkWell(
+            onTap: () {
+              _showChangeProfileImageDialog();
+            },
+            child: SizedBox(
+              width: 321,
+              height: 40,
+              child: Text(
+                '프로필 이미지 변경',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  height: 0,
+                  letterSpacing: -0.33,
+                ),
               ),
             ),
           ),
         ),
         Positioned(
-          child: SizedBox(
-            width: 321,
-            height: 40,
-            child: Text(
-              '닉네임 설정',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 15,
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                height: 0,
-                letterSpacing: -0.33,
+          child: InkWell(
+            onTap: () {
+              _showChangeNicknameDialog();
+            },
+            child: SizedBox(
+              width: 321,
+              height: 40,
+              child: Text(
+                '닉네임 설정',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  height: 0,
+                  letterSpacing: -0.33,
+                ),
               ),
             ),
           ),
@@ -377,5 +386,100 @@ class _MyInfoState extends State<MyInfoPage> {
         );
       },
     );
+  }
+
+  // 비밀번호 변경 팝업창
+  Future<void> _showChangePasswordDialog() async {
+    String? currentPassword;
+    String? newPassword;
+    String? confirmPassword;
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('비밀번호 변경'),
+          content: Column(
+            children: [
+              TextField(
+                obscureText: true,
+                onChanged: (value) {
+                  currentPassword = value;
+                },
+                decoration: InputDecoration(labelText: '현재 비밀번호'),
+              ),
+              TextField(
+                obscureText: true,
+                onChanged: (value) {
+                  newPassword = value;
+                },
+                decoration: InputDecoration(labelText: '새 비밀번호'),
+              ),
+              TextField(
+                obscureText: true,
+                onChanged: (value) {
+                  confirmPassword = value;
+                },
+                decoration: InputDecoration(labelText: '새 비밀번호 확인'),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // 취소 버튼
+                Navigator.of(context).pop();
+              },
+              child: Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+                // 확인 버튼
+                if (currentPassword != null &&
+                    newPassword != null &&
+                    confirmPassword != null &&
+                    newPassword == confirmPassword) {
+                  // 현재 비밀번호 확인 및 새 비밀번호 일치 여부 확인 후 비밀번호 변경 로직 수행
+                  _changePassword(currentPassword!, newPassword!);
+                  Navigator.of(context).pop();
+                } else {
+                  // 비밀번호 불일치 에러 처리
+                }
+              },
+              child: Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 비밀번호 변경 로직
+  void _changePassword(String currentPassword, String newPassword) async {
+    try {
+      User? user = _authentication.currentUser;
+      // 기존 비밀번호 확인
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: user!.email!,
+        password: currentPassword,
+      );
+      await user.reauthenticateWithCredential(credential);
+      // 새 비밀번호로 변경
+      await user.updatePassword(newPassword);
+      // 비밀번호 변경 성공 메시지 등 추가 로직 수행
+    } catch (e) {
+      // 에러 처리 (예: 현재 비밀번호가 틀릴 경우, 인터넷 연결이 안 될 경우 등)
+      print(e.toString());
+    }
+  }
+
+  // 이미지 변경
+  Future<void> _showChangeProfileImageDialog() async {
+    // 이미지 변경 로직 추가
+  }
+
+  // 닉네임 변경
+  Future<void> _showChangeNicknameDialog() async {
+    // 닉네임 변경 로직 추가
   }
 }

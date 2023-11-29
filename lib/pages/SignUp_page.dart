@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../main.dart';
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -18,7 +18,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _verificationCodeController = TextEditingController();
   final _authentication = FirebaseAuth.instance;
-
+  final _db = FirebaseFirestore.instance;
   bool _isIdAvailable = true; // 아이디 중복 확인 결과 (일단 true로 초기화)
 
   @override
@@ -114,6 +114,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     email: _phoneNumberController.text,
                     password: _passwordController.text,
                   );
+                  await _db.collection('member').add({'name' : _nameController.text});
                   if(newUser.user!=null){
                     Navigator.push(
                       context,
@@ -129,7 +130,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content:
-                        Text('올바르지 않은 아이디나 패스워드 형식입니다.'),
+                        Text('이미 생성된 이메일 주소입니다.'),
                         backgroundColor: Colors.blue,
                       ),
                   );

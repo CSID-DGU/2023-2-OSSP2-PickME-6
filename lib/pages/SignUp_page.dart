@@ -114,7 +114,13 @@ class _SignUpPageState extends State<SignUpPage> {
                     email: _phoneNumberController.text,
                     password: _passwordController.text,
                   );
-                  await _db.collection('member').add({'name' : _nameController.text});
+                  await _db.collection('user').doc(newUser.user!.uid)
+                      .set({
+                        'nickName' : _nameController.text,
+                        'email' :_phoneNumberController.text,
+                        'password' :_passwordController.text,
+                        'userName' : _nameController.text,
+                      });
                   if(newUser.user!=null){
                     Navigator.push(
                       context,

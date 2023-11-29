@@ -40,8 +40,8 @@ class _LoginPageState extends State<LoginPage> {
             TextField(
               controller: _idController,
               decoration: InputDecoration(
-                labelText: '아이디',
-                hintText: '아이디를 입력하세요',
+                labelText: '이메일',
+                hintText: '이메일을 입력하세요',
                 border: UnderlineInputBorder(),
                 prefixIcon: Icon(Icons.person),
               ),
@@ -136,6 +136,8 @@ class _LoginPageState extends State<LoginPage> {
                 ],
               ),
             ),
+            SizedBox(height: 10),
+
           ],
         ),
       ),

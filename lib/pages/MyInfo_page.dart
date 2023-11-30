@@ -3,6 +3,7 @@ import 'package:ossp_pickme/pages/MatchRecord_page.dart';
 import 'package:ossp_pickme/pages/Login_page.dart';
 import 'package:ossp_pickme/pages/Inquiry_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MyInfoPage extends StatefulWidget {
   const MyInfoPage({Key? key}) : super(key: key);
@@ -13,10 +14,37 @@ class MyInfoPage extends StatefulWidget {
 
 class _MyInfoState extends State<MyInfoPage> {
   final _authentication = FirebaseAuth.instance;
-  String _nickName = '닉네임'; // 닉네임 초기값 설정
+  final _firestore = FirebaseFirestore.instance;
+
   String _profileImage = 'assets/silhouette_image.jpg'; // 기본 이미지 경로
+  String _nickname = '';
 
   @override
+  void initState() {
+    super.initState();
+    // 페이지가 생성될 때 닉네임을 Firestore에서 가져와서 업데이트
+    _fetchNickname();
+  }
+
+  Future<void> _fetchNickname() async {
+    try {
+      User? user = _authentication.currentUser;
+
+      if (user != null) {
+        // Firestore에서 닉네임 가져오기
+        DocumentSnapshot<Map<String, dynamic>> snapshot =
+        await _firestore.collection('user').doc(user.uid).get();
+
+        // 가져온 닉네임을 상태에 반영
+        setState(() {
+          _nickname = snapshot['nickName'] ?? '';
+        });
+      }
+    } catch (e) {
+      print('닉네임을 가져오는 동안 오류 발생: $e');
+    }
+  }
+
   final List<Widget> _pages = [
     const MatchRecord(),
     const LoginPage(),
@@ -71,7 +99,7 @@ class _MyInfoState extends State<MyInfoPage> {
                       width: 257.17,
                       height: 30,
                       child: Text(
-                        '닉네임',
+                        _nickname,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 20,
@@ -478,8 +506,81 @@ class _MyInfoState extends State<MyInfoPage> {
     // 이미지 변경 로직 추가
   }
 
-  // 닉네임 변경
+  // 닉네임 변경 다이얼로그
   Future<void> _showChangeNicknameDialog() async {
-    // 닉네임 변경 로직 추가
+    String newNickname = '';
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      // 사용자의 현재 닉네임을 가져옵니다.
+      final currentNickname = user.displayName;
+
+      return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('닉네임 변경'),
+            content: Column(
+              children: [
+                // 기존 닉네임을 보여줍니다.
+                Text('기존 닉네임: $currentNickname'),
+
+                // 새로운 닉네임을 입력받습니다.
+                TextField(
+                  onChanged: (value) {
+                    newNickname = value;
+                  },
+                  decoration: InputDecoration(labelText: '새로운 닉네임'),
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('취소'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await _updateNickname(user, newNickname);
+                  Navigator.of(context).pop();
+                },
+                child: Text('변경'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // 사용자가 로그인되어 있지 않은 경우에 대한 예외 처리
+      print('사용자가 로그인되어 있지 않습니다.');
+    }
+  }
+
+  // 새로운 닉네임으로 업데이트하는 함수 (Firebase 사용)
+  Future<void> _updateNickname(User user, String newNickname) async {
+    try {
+      DocumentReference<Map<String, dynamic>> userDoc =
+      _firestore.collection('user').doc(user.uid);
+
+      // 사용자의 닉네임을 업데이트합니다.
+      await user.updateDisplayName(newNickname);
+
+      // Firestore에도 닉네임을 업데이트합니다.
+      await userDoc.update({'nickName': newNickname});
+
+      // 닉네임이 성공적으로 업데이트되면 해당 정보를 출력하고 상태를 업데이트
+      print('Firebase에서 사용자의 닉네임을 성공적으로 업데이트했습니다. 새로운 닉네임: $newNickname');
+
+      // 상태에 반영
+      setState(() {
+        _nickname = newNickname;
+      });
+
+    } catch (e) {
+      // 업데이트 중에 오류가 발생한 경우에 대한 예외 처리
+      print('닉네임 업데이트 중 오류 발생: $e');
+    }
   }
 }

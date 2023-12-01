@@ -120,6 +120,8 @@ class _SignUpPageState extends State<SignUpPage> {
                         'email' :_phoneNumberController.text,
                         'password' :_passwordController.text,
                         'userName' : _nameController.text,
+                        'profile_image' : 'https://firebasestorage.googleapis.com/v0/b/ossp2-pickme-6.appspot.com/o/'
+                            'user_profile%2Fbasic.png?alt=media&token=36245461-8e02-49b7-93b5-9950eed46c34',
                       });
                   if(newUser.user!=null){
                     Navigator.push(

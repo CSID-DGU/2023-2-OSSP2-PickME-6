@@ -22,16 +22,7 @@ class ChatBubbles extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(0,10,45,0),
                 child:
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      userName,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500, color:  Colors.black,
-                      )
-                    ),
-                    ChatBubble(
+                  ChatBubble(
                         clipper: ChatBubbleClipper3(type: BubbleType.sendBubble),
                         alignment: Alignment.topRight,
                         margin: EdgeInsets.only(top: 20),
@@ -40,28 +31,29 @@ class ChatBubbles extends StatelessWidget {
                           constraints: BoxConstraints(
                             maxWidth: MediaQuery.of(context).size.width * 0.7,
                           ),
-                          child: Text(
-                            message,
-                            style: TextStyle(color: Colors.white),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                userName,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold, color:  Colors.white,
+                                )
+                              ),
+                              Text(
+                                message,
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                  ],
-                ),
                 ),
             if(!isMe)
               Padding(
                 padding: const EdgeInsets.fromLTRB(45,10,0,0),
                 child:
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                        userName,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold, color:  Colors.black,
-                        )
-                    ),
+
                     ChatBubble(
                       clipper: ChatBubbleClipper3(type: BubbleType.receiverBubble),
                       backGroundColor: Color(0xffE7E7ED),
@@ -70,14 +62,22 @@ class ChatBubbles extends StatelessWidget {
                         constraints: BoxConstraints(
                           maxWidth: MediaQuery.of(context).size.width * 0.7,
                         ),
-                        child: Text(
-                          message,
-                          style: TextStyle(color: Colors.black),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                              userName,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold, color:  Colors.black,
+                              )
+                              ),Text(
+                                message,
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ]
+                          ),
                         ),
-                      ),
                     ),
-                  ],
-                ),
               )
           ],
         ),

@@ -20,7 +20,7 @@ class _NewMessageState extends State<NewMessage> {
       'time' : Timestamp.now(),
       'userID' : user!.uid,
       'userName' : userData.data()!['userName'],
-      'userImage' : userData['picked_image']
+      'userImage' : userData['profile_image'],
     });
     _controller.clear();
   }

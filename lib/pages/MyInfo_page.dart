@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:ossp_pickme/pages/MatchRecord_page.dart';
 import 'package:ossp_pickme/pages/Login_page.dart';
 import 'package:ossp_pickme/pages/Inquiry_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'add_image.dart';
 class MyInfoPage extends StatefulWidget {
   const MyInfoPage({Key? key}) : super(key: key);
 
@@ -15,6 +18,7 @@ class _MyInfoState extends State<MyInfoPage> {
   final _authentication = FirebaseAuth.instance;
   String _nickName = '닉네임'; // 닉네임 초기값 설정
   String _profileImage = 'assets/silhouette_image.jpg'; // 기본 이미지 경로
+
 
   @override
   final List<Widget> _pages = [
@@ -263,7 +267,7 @@ class _MyInfoState extends State<MyInfoPage> {
         Positioned(
           child: InkWell(
             onTap: () {
-              _showChangeProfileImageDialog();
+              _showChangeProfileImageDialog(context);
             },
             child: SizedBox(
               width: 321,
@@ -473,9 +477,18 @@ class _MyInfoState extends State<MyInfoPage> {
     }
   }
 
+
   // 이미지 변경
-  Future<void> _showChangeProfileImageDialog() async {
-    // 이미지 변경 로직 추가
+  void _showChangeProfileImageDialog(BuildContext context){
+    showDialog(
+        context: context,
+        builder: (context){
+          return Dialog(
+            backgroundColor: Colors.white,
+            child: AddImage(),
+          );
+        },
+    );
   }
 
   // 닉네임 변경

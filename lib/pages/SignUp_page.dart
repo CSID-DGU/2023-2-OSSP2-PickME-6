@@ -1,8 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../main.dart';
+
+class AuthService {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<UserCredential> signUp(String email, String password) async {
+    try {
+      return await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+    } catch (e) {
+      // 에러 처리
+      rethrow;
+    }
+  }
+
+}
+
+class FirestoreService {
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  Future<void> addUser(String userId, String name, String university, String studentID) async {
+    try {
+      await _db.collection('users').doc(userId).set({
+        'name': name,
+        'university': university,
+        'studentID': studentID,
+        'role': 0,
+      });
+    } catch (e) {
+      // 에러 처리
+      rethrow;
+    }
+  }
+
+}
+
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
 
@@ -12,14 +48,11 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _idController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  final TextEditingController _phoneNumberController = TextEditingController();
-  final TextEditingController _verificationCodeController = TextEditingController();
-  final _authentication = FirebaseAuth.instance;
-  final _db = FirebaseFirestore.instance;
-  bool _isIdAvailable = true; // 아이디 중복 확인 결과 (일단 true로 초기화)
+  final TextEditingController _universityController = TextEditingController();
+  final TextEditingController _studentIDController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +66,7 @@ class _SignUpPageState extends State<SignUpPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // 이름 입력칸
+            // 이름 입력
             SizedBox(
               width: 200,
               child: TextField(
@@ -42,106 +75,93 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
             ),
             SizedBox(height: 10),
-            // 아이디 입력칸 및 중복확인 버튼
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _idController,
-                    decoration: InputDecoration(labelText: '아이디'),
-                  ),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    // 중복 확인 코드 구현 필요
-                    _isIdAvailable = true;
-                    // 임시로 true 설정
-                  },
-                  child: Text('중복확인',style: TextStyle(color: Colors.black),
-                  ),
-                ),
-              ],
+            // 이메일 입력
+            TextField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(labelText: '이메일'),
             ),
             SizedBox(height: 10),
-            // 비밀번호 입력칸
+            // 비밀번호 입력
             TextField(
               controller: _passwordController,
               obscureText: true,
               decoration: InputDecoration(labelText: '비밀번호'),
             ),
             SizedBox(height: 10),
-            // 비밀번호 재입력칸
+            // 비밀번호 재입력
             TextField(
               controller: _confirmPasswordController,
               obscureText: true,
               decoration: InputDecoration(labelText: '비밀번호 재입력'),
             ),
             SizedBox(height: 10),
-            // 휴대폰 번호 입력칸과 인증하기 버튼
+            // 대학교 입력, 학번 입력
             Row(
               children: [
+                // 대학교 입력
                 Expanded(
                   child: TextField(
-                    controller: _phoneNumberController,
-                    decoration: InputDecoration(labelText: '휴대폰 번호'),
+                    controller: _universityController,
+                    decoration: InputDecoration(labelText: '대학교'),
                   ),
                 ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    // 휴대전화 인증 번호 발송 코드 짜기
-                  },
-                  child: Text('인증하기',
-                  style: TextStyle(color: Colors.black),
+                SizedBox(width: 10), // 간격 조절
+                // 학번 입력칸
+                SizedBox(
+                  width: 150, //크기 조절
+                  child: TextField(
+                    controller: _studentIDController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(labelText: '학번'),
+                  ),
                 ),
-                )
               ],
             ),
-            SizedBox(height: 10),
-            // 인증번호 확인 칸
-            TextField(
-              controller: _verificationCodeController,
-              decoration: InputDecoration(labelText: '인증번호 확인'),
-            ),
-            SizedBox(height: 20),
+            SizedBox(height: 10), // 간격 조절
             // 회원가입 버튼
             ElevatedButton(
-              onPressed: () async{
+              onPressed: () async {
                 try {
-                  final newUser = await _authentication
-                      .createUserWithEmailAndPassword(
-                    email: _phoneNumberController.text,
-                    password: _passwordController.text,
+                  final newUser = await AuthService().signUp(
+                    _emailController.text,
+                    _passwordController.text,
                   );
-                  await _db.collection('user').doc(newUser.user!.uid)
-                      .set({
-                        'nickName' : _nameController.text,
-                        'email' :_phoneNumberController.text,
-                        'password' :_passwordController.text,
-                        'userName' : _nameController.text,
-                        'profile_image' : 'https://firebasestorage.googleapis.com/v0/b/ossp2-pickme-6.appspot.com/o/'
-                            'user_profile%2Fbasic.png?alt=media&token=36245461-8e02-49b7-93b5-9950eed46c34',
-                      });
-                  if(newUser.user!=null){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context){
-                        return MyHomePage(
-                          title: 'PickME',
-                        );
-                      }),
-                    );
+
+                  await FirestoreService().addUser(
+                    newUser.user!.uid,
+                    _nameController.text,
+                    _universityController.text,
+                    _studentIDController.text,
+                  );
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) {
+                      return MyHomePage(
+                        title: 'PickME',
+                      );
+                    }),
+                  );
+                } catch (e) {
+                  // 에러 처리
+                  if (e is FirebaseAuthException) {
+                    if (e.code == 'email-already-in-use') {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('이미 생성된 이메일 주소입니다.'),
+                          backgroundColor: Colors.blue,
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('회원가입에 실패했습니다. 다시 시도해주세요.'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   }
-                }catch(e){
-                  print(e);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content:
-                        Text('이미 생성된 이메일 주소입니다.'),
-                        backgroundColor: Colors.blue,
-                      ),
-                  );
                 }
               },
               style: ElevatedButton.styleFrom(

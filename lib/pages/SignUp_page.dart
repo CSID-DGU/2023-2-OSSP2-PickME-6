@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:ossp_pickme/pages/Login_page.dart';
 import '../main.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -17,18 +21,20 @@ class AuthService {
       rethrow;
     }
   }
-
 }
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Future<void> addUser(String userId, String name, String university, String studentID) async {
+  Future<void> addUser(String userId, String userName, String university, String studentID, String nickName, String email, String password) async {
     try {
-      await _db.collection('users').doc(userId).set({
-        'name': name,
+      await _db.collection('user').doc(userId).set({
+        'userName': userName,
         'university': university,
         'studentID': studentID,
+        'nickName': nickName,
+        'email': email,
+        'password': password,
         'role': 0,
       });
     } catch (e) {
@@ -36,7 +42,6 @@ class FirestoreService {
       rethrow;
     }
   }
-
 }
 
 class SignUpPage extends StatefulWidget {
@@ -47,12 +52,16 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
   final TextEditingController _universityController = TextEditingController();
   final TextEditingController _studentIDController = TextEditingController();
+  final TextEditingController _nickNameController = TextEditingController();
+  final ImagePicker _picker = ImagePicker(); // 이미지 피커 인스턴스
+
+  File? _studentIDImage; // 학생증 이미지 파일
 
   @override
   Widget build(BuildContext context) {
@@ -70,11 +79,22 @@ class _SignUpPageState extends State<SignUpPage> {
             SizedBox(
               width: 200,
               child: TextField(
-                controller: _nameController,
+                controller: _userNameController,
                 decoration: InputDecoration(labelText: '이름'),
               ),
             ),
             SizedBox(height: 10),
+
+            // 닉네임 입력
+            SizedBox(
+              width: 200,
+              child: TextField(
+                controller: _nickNameController,
+                decoration: InputDecoration(labelText: '닉네임'),
+              ),
+            ),
+            SizedBox(height: 10),
+
             // 이메일 입력
             TextField(
               controller: _emailController,
@@ -82,6 +102,7 @@ class _SignUpPageState extends State<SignUpPage> {
               decoration: InputDecoration(labelText: '이메일'),
             ),
             SizedBox(height: 10),
+
             // 비밀번호 입력
             TextField(
               controller: _passwordController,
@@ -89,13 +110,15 @@ class _SignUpPageState extends State<SignUpPage> {
               decoration: InputDecoration(labelText: '비밀번호'),
             ),
             SizedBox(height: 10),
-            // 비밀번호 재입력
+
+            // 비밀번호 확인 입력
             TextField(
               controller: _confirmPasswordController,
               obscureText: true,
-              decoration: InputDecoration(labelText: '비밀번호 재입력'),
+              decoration: InputDecoration(labelText: '비밀번호 확인'),
             ),
             SizedBox(height: 10),
+
             // 대학교 입력, 학번 입력
             Row(
               children: [
@@ -107,7 +130,8 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
                 SizedBox(width: 10), // 간격 조절
-                // 학번 입력칸
+
+                // 학번 입력
                 SizedBox(
                   width: 150, //크기 조절
                   child: TextField(
@@ -119,6 +143,19 @@ class _SignUpPageState extends State<SignUpPage> {
               ],
             ),
             SizedBox(height: 10), // 간격 조절
+
+            // 학생증 첨부 버튼
+            ElevatedButton(
+              onPressed: _pickStudentIDImage,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF2B4177),
+              ),
+              child: Text(
+                '학생증 첨부',
+                style: TextStyle(color: Color(0xFFC4C4C4)),
+              ),
+            ),
+
             // 회원가입 버튼
             ElevatedButton(
               onPressed: () async {
@@ -130,18 +167,39 @@ class _SignUpPageState extends State<SignUpPage> {
 
                   await FirestoreService().addUser(
                     newUser.user!.uid,
-                    _nameController.text,
+                    _userNameController.text,
                     _universityController.text,
                     _studentIDController.text,
+                    _nickNameController.text,
+                    _emailController.text,
+                    _passwordController.text,
                   );
 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) {
-                      return MyHomePage(
-                        title: 'PickME',
+                  // 학생증 이미지 업로드 및 URL 가져오기 아직 안씀
+                  final studentIDImageUrl = await _uploadStudentIDImage(newUser.user!.uid);
+
+                  // 회원가입 승인 대기 팝업
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('회원가입 승인대기'),
+                        content: Text('회원가입이 되었습니다. 관리자 승인 후 로그인 가능합니다. (약 1시간 소요될 수 있습니다.)'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              // 팝업 창 닫기
+                              Navigator.of(context).pop();
+                              // 로그인 화면으로 이동
+                              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                                builder: (context) => LoginPage(),
+                              ));
+                            },
+                            child: Text('확인'),
+                          ),
+                        ],
                       );
-                    }),
+                    },
                   );
                 } catch (e) {
                   // 에러 처리
@@ -176,5 +234,27 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       ),
     );
+  }
+  //이미지 첨부
+  Future<void> _pickStudentIDImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _studentIDImage = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<String> _uploadStudentIDImage(String userId) async {
+    try {
+      final storage = FirebaseStorage.instance;
+      final ref = storage.ref().child('studentIDImages/$userId.jpg');
+      await ref.putFile(_studentIDImage!);
+      final url = await ref.getDownloadURL();
+      return url;
+    } catch (e) {
+      // 이미지 업로드 에러 처리
+      rethrow;
+    }
   }
 }

@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/82103/Desktop/OSSPrac_hw/ossp_pickme/ossp_pickme/windows/flutter",
-      "program": "c:/Users/82103/Desktop/OSSPrac_hw/ossp_pickme/ossp_pickme/windows/flutter/build/Debug/outDebug",
+      "cwd": "c:/Users/82103/Desktop/OSSPrac_hw/ossp_pickme/ossp_pickme/linux/flutter",
+      "program": "c:/Users/82103/Desktop/OSSPrac_hw/ossp_pickme/ossp_pickme/linux/flutter/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

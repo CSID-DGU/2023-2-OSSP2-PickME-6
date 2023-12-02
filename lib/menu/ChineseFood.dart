@@ -27,22 +27,48 @@ class _ChineseState extends State<ChineseFood> {
           padding: const EdgeInsets.all(5.0),
           children: <Widget>[
             //1번
-            GestureDetector(
-              onTap: () {
-                print('container click test');
-              },
-              child: Container(
+              Container(
           width: MediaQuery.of(context).size.width,
           height: 100,
           padding: EdgeInsets.all(20),
-          child: Text(
+          child: Column(
+            children: <Widget>[
+              Image.network('https://cdn.pixabay.com/photo/2016/03/23/15/00/ice-cream-1274894_1280.jpg'),
+              Text(
             '음식1',
-            textAlign: TextAlign.left,
+            textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.black,
               fontSize: 25,
             ),
           ),
+          //매칭 현황 출력하기
+          Container(
+            child: Text('현재 매칭 현황',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+            ),
+            ),
+          ),
+             ElevatedButton(
+              onPressed: (){
+                //매칭 바로 선택되도록 이동하기 
+              }, 
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF2B4177), 
+              ),
+              child: Text(
+              'Matching',
+               style: TextStyle(
+                color: Colors.white,
+                ),
+              ),
+              ),
+
+            ]
+          ),
+          //박스 채우기
           decoration: BoxDecoration(
           color: const Color.fromARGB(245, 255, 255, 255),
           borderRadius: BorderRadius.circular(10.0),
@@ -56,9 +82,10 @@ class _ChineseState extends State<ChineseFood> {
           ]
           ),
         ),
-        )
-
         
+          
+
+
           ],
 
 

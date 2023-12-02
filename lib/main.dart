@@ -34,8 +34,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
                primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'PickME Home Page'),
-      //home: const LoginPage(),
+      home: const LoginPage(),
     );
   }
 }

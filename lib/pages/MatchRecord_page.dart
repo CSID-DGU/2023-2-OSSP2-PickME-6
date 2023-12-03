@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ossp_pickme/pages/OrderDetail_page.dart';
+import 'package:ossp_pickme/pages/Review_page.dart';
 
 class MatchRecord extends StatelessWidget {
   const MatchRecord({super.key});
@@ -217,16 +218,31 @@ class MatchingRecord extends StatelessWidget {
                         child: SizedBox(
                           width: 60,
                           height: 24,
-                          child: Text(
-                            '리뷰쓰기',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 11,
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              height: 0,
-                              letterSpacing: -0.30,
+                          child: TextButton(
+                            onPressed: () {
+                              // 리뷰쓰기 버튼이 클릭되었을 때의 동작
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ReviewPage(
+                                    restaurantName: restaurantName,
+                                    menuName: menuName,
+                                    orderDate: date,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              '리뷰쓰기',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 11,
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w400,
+                                height: 0,
+                                letterSpacing: -0.30,
+                              ),
                             ),
                           ),
                         ),

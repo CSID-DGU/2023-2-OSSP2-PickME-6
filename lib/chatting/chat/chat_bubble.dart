@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/bubble_type.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
-import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_3.dart';
+import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_8.dart';
 class ChatBubbles extends StatelessWidget {
   const ChatBubbles(this.message, this.isMe, this.userName, this.userImage, {Key? key}):super(key:key);
 
@@ -23,7 +23,7 @@ class ChatBubbles extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(0,10,45,0),
                 child:
                   ChatBubble(
-                        clipper: ChatBubbleClipper3(type: BubbleType.sendBubble),
+                        clipper: ChatBubbleClipper8(type: BubbleType.sendBubble),
                         alignment: Alignment.topRight,
                         margin: EdgeInsets.only(top: 20),
                         backGroundColor: Colors.blue,
@@ -32,7 +32,7 @@ class ChatBubbles extends StatelessWidget {
                             maxWidth: MediaQuery.of(context).size.width * 0.7,
                           ),
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
                                 userName,
@@ -55,7 +55,7 @@ class ChatBubbles extends StatelessWidget {
                 child:
 
                     ChatBubble(
-                      clipper: ChatBubbleClipper3(type: BubbleType.receiverBubble),
+                      clipper: ChatBubbleClipper8(type: BubbleType.receiverBubble),
                       backGroundColor: Color(0xffE7E7ED),
                       margin: EdgeInsets.only(top: 20),
                       child: Container(
@@ -63,7 +63,7 @@ class ChatBubbles extends StatelessWidget {
                           maxWidth: MediaQuery.of(context).size.width * 0.7,
                         ),
                         child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                               userName,

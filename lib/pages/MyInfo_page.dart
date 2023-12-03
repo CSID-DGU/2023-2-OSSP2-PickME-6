@@ -405,7 +405,12 @@ class _MyInfoState extends State<MyInfoPage> {
             TextButton(
               onPressed: () {
                 // 확인 버튼
+
                 User? user = _authentication.currentUser;
+                _firestore.collection("user").doc(user!.uid).delete().then(
+                      (doc) => print("Document deleted"),
+                  onError: (e) => print("Error updating document $e"),
+                );
                 user!.delete();
                 // 로그인 화면으로 이동
                 Navigator.pushReplacement(

@@ -36,6 +36,7 @@ class FirestoreService {
         'email': email,
         'password': password,
         'role': 0,
+        'profile_image' : 'https://firebasestorage.googleapis.com/v0/b/ossp2-pickme-6.appspot.com/o/user_profile%2Fbasic.png?alt=media&token=36245461-8e02-49b7-93b5-9950eed46c34',
       });
     } catch (e) {
       // 에러 처리
@@ -174,7 +175,6 @@ class _SignUpPageState extends State<SignUpPage> {
                     _emailController.text,
                     _passwordController.text,
                   );
-
                   // 학생증 이미지 업로드 및 URL 가져오기 아직 안씀
                   final studentIDImageUrl = await _uploadStudentIDImage(newUser.user!.uid);
 

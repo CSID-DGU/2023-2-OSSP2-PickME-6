@@ -22,6 +22,7 @@ class _NewMessageState extends State<NewMessage> {
       'userName' : userData.data()!['userName'],
       'userImage' : userData['profile_image'],
     });
+
     _controller.clear();
   }
   @override

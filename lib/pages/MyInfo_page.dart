@@ -37,8 +37,7 @@ class _MyInfoState extends State<MyInfoPage> {
 
       if (user != null) {
         // Firestore에서 닉네임 가져오기
-        DocumentSnapshot<Map<String, dynamic>> snapshot =
-        await _firestore.collection('user').doc(user.uid).get();
+        DocumentSnapshot<Map<String, dynamic>> snapshot = await _firestore.collection('user').doc(user.uid).get();
 
         // 가져온 닉네임을 상태에 반영
         setState(() {
@@ -473,12 +472,9 @@ class _MyInfoState extends State<MyInfoPage> {
             TextButton(
               onPressed: () {
                 // 확인 버튼
-                if (currentPassword != null &&
-                    newPassword != null &&
-                    confirmPassword != null &&
-                    newPassword == confirmPassword) {
+                if (currentPassword != null && newPassword != null && confirmPassword != null && newPassword == confirmPassword) {
                   // 현재 비밀번호 확인 및 새 비밀번호 일치 여부 확인 후 비밀번호 변경 로직 수행
-                  _changePassword(currentPassword!, newPassword!);
+                  _changePassword(currentPassword!, confirmPassword!, newPassword!);
                   Navigator.of(context).pop();
                 } else {
                   // 비밀번호 불일치 에러 처리
@@ -493,24 +489,82 @@ class _MyInfoState extends State<MyInfoPage> {
   }
 
   // 비밀번호 변경 로직
-  void _changePassword(String currentPassword, String newPassword) async {
+  void _changePassword(String currentPassword, String confirmPassword, String newPassword) async {
     try {
       User? user = _authentication.currentUser;
-      // 기존 비밀번호 확인
-      AuthCredential credential = EmailAuthProvider.credential(
-        email: user!.email!,
-        password: currentPassword,
-      );
-      await user.reauthenticateWithCredential(credential);
-      // 새 비밀번호로 변경
+
+      // 현재 비밀번호 확인
+      if (!await _checkCurrentPassword(user!.email!, currentPassword)) {
+        // 실패 메시지 표시
+        _showFailureDialog('현재 비밀번호를 잘못 입력했습니다.');
+        return;
+      }
+
+      // 새 비밀번호가 6자리 이상인지 확인
+      if (newPassword.length < 6) {
+        // 실패 메시지 표시
+        _showFailureDialog('새 비밀번호는 6자리 이상이어야 합니다.');
+        return;
+      }
+
+      // 새 비밀번호와 확인 값이 일치하는지 확인
+      if (confirmPassword != newPassword) {
+        // 실패 메시지 표시
+        _showFailureDialog('새 비밀번호 입력과 새 비밀번호 확인이 일치하지 않습니다.');
+        return;
+      }
+
+      // 비밀번호 변경 성공 시 Firestore DB에 반영
       await user.updatePassword(newPassword);
+
+      // Firestore DB에도 반영
+      await _firestore.collection('user').doc(user.uid).update({
+        'password': newPassword,
+      });
+
       // 비밀번호 변경 성공 메시지 등 추가 로직 수행
+      print('비밀번호가 성공적으로 변경되었습니다.');
     } catch (e) {
-      // 에러 처리 (예: 현재 비밀번호가 틀릴 경우, 인터넷 연결이 안 될 경우 등)
-      print(e.toString());
+      // 실패 메시지 표시
+      _showFailureDialog('비밀번호 변경 중 오류 발생');
     }
   }
 
+// 현재 비밀번호 확인 함수
+  Future<bool> _checkCurrentPassword(String email, String currentPassword) async {
+    try {
+      UserCredential userCredential = await _authentication.signInWithEmailAndPassword(
+        email: email,
+        password: currentPassword,
+      );
+      // 로그인에 성공하면 현재 비밀번호가 맞는 것으로 간주
+      return true;
+    } catch (e) {
+      // 로그인 실패 시
+      return false;
+    }
+  }
+
+  // 비밀번호 변경 실패 팝업창
+  void _showFailureDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('오류'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   // 이미지 변경
   void _showChangeProfileImageDialog(BuildContext context){
@@ -541,10 +595,10 @@ class _MyInfoState extends State<MyInfoPage> {
             title: Text('닉네임 변경'),
             content: Column(
               children: [
-                // 기존 닉네임을 보여줍니다.
+                // 기존 닉네임
                 Text('기존 닉네임: $currentNickname'),
 
-                // 새로운 닉네임을 입력받습니다.
+                // 새로운 닉네임
                 TextField(
                   onChanged: (value) {
                     newNickname = value;
@@ -583,10 +637,10 @@ class _MyInfoState extends State<MyInfoPage> {
       DocumentReference<Map<String, dynamic>> userDoc =
       _firestore.collection('user').doc(user.uid);
 
-      // 사용자의 닉네임을 업데이트합니다.
+      // 사용자의 닉네임 업데이트
       await user.updateDisplayName(newNickname);
 
-      // Firestore에도 닉네임을 업데이트합니다.
+      // Firestore에도 닉네임 업데이트.
       await userDoc.update({'nickName': newNickname});
 
       // 닉네임이 성공적으로 업데이트되면 해당 정보를 출력하고 상태를 업데이트

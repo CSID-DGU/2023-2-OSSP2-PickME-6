@@ -160,64 +160,82 @@ class _SignUpPageState extends State<SignUpPage> {
             // 회원가입 버튼
             ElevatedButton(
               onPressed: () async {
-                try {
-                  final newUser = await AuthService().signUp(
-                    _emailController.text,
-                    _passwordController.text,
+                if (_studentIDImage == null ||
+                    _userNameController.text.isEmpty ||
+                    _nickNameController.text.isEmpty ||
+                    _emailController.text.isEmpty ||
+                    _passwordController.text.isEmpty ||
+                    _universityController.text.isEmpty ||
+                    _studentIDController.text.isEmpty) {
+                  // 빈 필드값 있으면 회원가입 불가능
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('빈 항목이 없는지 확인해주세요.'),
+                      backgroundColor: Colors.red,
+                    ),
                   );
+                } else {
+                  try {
+                    //회원가입
+                    final newUser = await AuthService().signUp(
+                      _emailController.text,
+                      _passwordController.text,
+                    );
 
-                  await FirestoreService().addUser(
-                    newUser.user!.uid,
-                    _userNameController.text,
-                    _universityController.text,
-                    _studentIDController.text,
-                    _nickNameController.text,
-                    _emailController.text,
-                    _passwordController.text,
-                  );
-                  // 학생증 이미지 업로드 및 URL 가져오기 아직 안씀
-                  final studentIDImageUrl = await _uploadStudentIDImage(newUser.user!.uid);
+                    // 학생증 업로드 및 URL 가져오기
+                    final studentIDImageUrl = await _uploadStudentIDImage(newUser.user!.uid);
 
-                  // 회원가입 승인 대기 팝업
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text('회원가입 승인대기'),
-                        content: Text('회원가입이 되었습니다. 관리자 승인 후 로그인 가능합니다. (약 1시간 소요될 수 있습니다.)'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              // 팝업 창 닫기
-                              Navigator.of(context).pop();
-                              // 로그인 화면으로 이동
-                              Navigator.of(context).pushReplacement(MaterialPageRoute(
-                                builder: (context) => LoginPage(),
-                              ));
-                            },
-                            child: Text('확인'),
+                    await FirestoreService().addUser(
+                      newUser.user!.uid,
+                      _userNameController.text,
+                      _universityController.text,
+                      _studentIDController.text,
+                      _nickNameController.text,
+                      _emailController.text,
+                      _passwordController.text,
+                    );
+
+                    // 회원가입 승인 대기 팝업
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('회원가입 승인대기'),
+                          content: Text('회원가입이 되었습니다. 관리자 승인 후 로그인 가능합니다. (약 1시간 소요될 수 있습니다.)'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                // 팝업 창 닫기
+                                Navigator.of(context).pop();
+                                // 로그인 화면으로 이동
+                                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                                  builder: (context) => LoginPage(),
+                                ));
+                              },
+                              child: Text('확인'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  } catch (e) {
+                    // 예외 처리
+                    if (e is FirebaseAuthException) {
+                      if (e.code == 'email-already-in-use') {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('이미 생성된 이메일 주소입니다.'),
+                            backgroundColor: Colors.blue,
                           ),
-                        ],
-                      );
-                    },
-                  );
-                } catch (e) {
-                  // 에러 처리
-                  if (e is FirebaseAuthException) {
-                    if (e.code == 'email-already-in-use') {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('이미 생성된 이메일 주소입니다.'),
-                          backgroundColor: Colors.blue,
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('회원가입에 실패했습니다. 다시 시도해주세요.'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('회원가입에 실패했습니다. 다시 시도해주세요.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     }
                   }
                 }

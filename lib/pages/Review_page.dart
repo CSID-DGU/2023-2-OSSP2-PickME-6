@@ -75,7 +75,6 @@ class _ReviewPageState extends State<ReviewPage> {
         Navigator.pop(context);
       } catch (e) {
         print('리뷰를 Firestore에 저장하는 중 오류 발생: $e');
-        // 예외 발생 시에 대한 처리를 추가할 수 있습니다.
       }
     } else {
       // 리뷰 내용이 비어있을 경우 경고 표시

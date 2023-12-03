@@ -566,21 +566,6 @@ class _MyInfoState extends State<MyInfoPage> {
     );
   }
 
-  /*
-  Future<void> _updatePasswordInFirestore(String userId, String newPassword) async {
-    try {
-      DocumentReference<Map<String, dynamic>> userDoc =
-      _firestore.collection('user').doc(userId);
-
-      // 사용자의 비밀번호를 업데이트
-      await userDoc.update({'password': newPassword});
-
-      print('Firestore에 사용자의 비밀번호를 성공적으로 업데이트했습니다.');
-    } catch (e) {
-      print('Firestore에서 비밀번호 업데이트 중 오류 발생: $e');
-    }
-  }
-*/
   // 이미지 변경
   void _showChangeProfileImageDialog(BuildContext context){
     showDialog(
@@ -610,10 +595,10 @@ class _MyInfoState extends State<MyInfoPage> {
             title: Text('닉네임 변경'),
             content: Column(
               children: [
-                // 기존 닉네임을 보여줍니다.
+                // 기존 닉네임
                 Text('기존 닉네임: $currentNickname'),
 
-                // 새로운 닉네임을 입력받습니다.
+                // 새로운 닉네임
                 TextField(
                   onChanged: (value) {
                     newNickname = value;
@@ -652,10 +637,10 @@ class _MyInfoState extends State<MyInfoPage> {
       DocumentReference<Map<String, dynamic>> userDoc =
       _firestore.collection('user').doc(user.uid);
 
-      // 사용자의 닉네임을 업데이트합니다.
+      // 사용자의 닉네임 업데이트
       await user.updateDisplayName(newNickname);
 
-      // Firestore에도 닉네임을 업데이트합니다.
+      // Firestore에도 닉네임 업데이트.
       await userDoc.update({'nickName': newNickname});
 
       // 닉네임이 성공적으로 업데이트되면 해당 정보를 출력하고 상태를 업데이트

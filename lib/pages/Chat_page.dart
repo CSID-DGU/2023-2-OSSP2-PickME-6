@@ -44,7 +44,6 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
       return snapshot.docs.map((doc) {
         var data = doc.data() as Map<String, dynamic>;
         return ChatRoom(
-          name: data['name'],
           makerId: data['makerId'],
           category: data['category'],
           foodName: data['foodName'],
@@ -68,7 +67,7 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField(
-                items: ['한식', '중식', '양식', '일식'].map((category) {
+                items: ['한식', '중식', '일식', '양식', '분식', '기타'].map((category) {
                   return DropdownMenuItem(
                     value: category,
                     child: Text(category),
@@ -82,7 +81,7 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
               ),
               TextFormField(
                 controller: foodNameController,
-                decoration: InputDecoration(labelText: '음식 이름'),
+                decoration: InputDecoration(labelText: '음식점 이름'),
               ),
               TextFormField(
                 controller: timerController,
@@ -119,15 +118,13 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
   void _createChatRoom(String category, String foodName, int timerSeconds) async {
     String? userId = await _getCurrentUserId();
     ChatRoom newChatRoom = ChatRoom(
-      name: '$category - $foodName',
       makerId: userId!,
       category: category,
       foodName: foodName,
       members: 0,
       remainingTime: timerSeconds,
     );
-    await _db.collection('chatRooms').add({
-      'name': newChatRoom.name,
+    await _db.collection('chatRooms').doc(newChatRoom.makerId).set({
       'makerId': newChatRoom.makerId,
       'category': newChatRoom.category,
       'foodName': newChatRoom.foodName,
@@ -184,7 +181,6 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
 }
 
 class ChatRoom {
-  final String name;
   final String makerId;
   final String category;
   final String foodName;
@@ -193,7 +189,6 @@ class ChatRoom {
   late int remainingTime;
 
   ChatRoom({
-    required this.name,
     required this.makerId,
     required this.category,
     required this.foodName,
@@ -238,7 +233,7 @@ class ChatRoomListItem extends StatelessWidget {
           );
         },
       ),
-      title: Text(chatRoom.name),
+      title: Text('[${chatRoom.category}]${chatRoom.foodName}'),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -250,7 +245,7 @@ class ChatRoomListItem extends StatelessWidget {
         onPressed: () {
           navigatorKey.currentState?.push(
             MaterialPageRoute(
-              builder: (context) => const ChatScreen(),
+              builder: (context) => ChatScreen(documentId: chatRoom.makerId),
             ),
           );
         },

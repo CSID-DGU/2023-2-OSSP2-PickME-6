@@ -4,7 +4,8 @@ import 'package:ossp_pickme/chatting/chat/messages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ossp_pickme/chatting/chat/new_messages.dart';
 class ChatScreen extends StatefulWidget{
-  const ChatScreen({Key? key}) : super(key : key);
+  final String documentId;
+  const ChatScreen({Key? key, required this.documentId}) : super(key : key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -13,6 +14,7 @@ class ChatScreen extends StatefulWidget{
 class _ChatScreenState extends State<ChatScreen>{
   final _authentication = FirebaseAuth.instance;
   User? loggedUser;
+
 
   @override
   void initState(){
@@ -51,12 +53,12 @@ class _ChatScreenState extends State<ChatScreen>{
         ],
       ),
       body: Container(
-        child: const Column(
+        child: Column(
           children: [
             Expanded(
-              child: Messages(),
+              child: Messages(documentId: widget.documentId),
             ),
-            NewMessage(),
+            NewMessage(documentId: widget.documentId),
           ]
         )
       )

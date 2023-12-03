@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 class NewMessage extends StatefulWidget {
-  const NewMessage({super.key});
+  final String documentId;
+  const NewMessage({super.key, required this.documentId});
 
   @override
   State<NewMessage> createState() => _NewMessageState();
@@ -15,7 +16,7 @@ class _NewMessageState extends State<NewMessage> {
     FocusScope.of(context).unfocus();
     final user = FirebaseAuth.instance.currentUser;
     final userData = await FirebaseFirestore.instance.collection('user').doc(user!.uid).get();
-    FirebaseFirestore.instance.collection('chat').add({
+    FirebaseFirestore.instance.collection('chatRooms').doc(widget.documentId).collection('chat').add({
       'text' : _userEnterMessage,
       'time' : Timestamp.now(),
       'userID' : user!.uid,

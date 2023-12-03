@@ -25,7 +25,7 @@ class _MatchingState extends State<MatchingPage> {
       '일식': ['돈카츠', '초밥', '라멘', '소바', '타코야끼', '회덮밥', '기타일식'],
       '양식': ['햄버거', '피자', '파스타', '기타양식'],
       '분식': ['김밥', '떡볶이', '쫄면', '라면', '튀김', '순대', '기타분식'],
-      '기타': ['샐러드' , '베이글' , '샌드위치', '카페류' , '기타기타']  ,
+      '기타': ['샐러드' , '베이글' , '샌드위치', '카페류' , '기타']  ,
     };
     categories = categoryToFoodMap.keys.toList();
     foods = categoryToFoodMap[selectedCategory] ?? [];

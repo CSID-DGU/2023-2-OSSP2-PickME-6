@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:ossp_pickme/main.dart';
 import 'dart:async';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import '../chatting/chat/chat_screen.dart';
-
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);
 
@@ -27,57 +28,114 @@ class ChatRoomListPage extends StatefulWidget {
 }
 
 class _ChatRoomListPageState extends State<ChatRoomListPage> {
-  List<ChatRoom> chatRooms = [
-    ChatRoom(
-      name: '라화방마라탕',
-      profileImage: '',
-      members: 3,
-      remainingTime: 300,
-    ),
-    ChatRoom(
-      name: '필동반점',
-      profileImage: '',
-      members: 2,
-      remainingTime: 600,
-    ),
-    ChatRoom(
-      name: '행복은 간장밥',
-      profileImage: '',
-      members: 2,
-      remainingTime: 200,
-    ),
-    ChatRoom(
-      name: '동국반점',
-      profileImage: '',
-      members: 1,
-      remainingTime: 400,
-    ),
-    ChatRoom(
-      name: '라화방마라탕',
-      profileImage: '',
-      members: 3,
-      remainingTime: 300,
-    ),
-    ChatRoom(
-      name: '필동반점',
-      profileImage: '',
-      members: 2,
-      remainingTime: 600,
-    ),
-    ChatRoom(
-      name: '행복은 간장밥',
-      profileImage: '',
-      members: 2,
-      remainingTime: 200,
-    ),
-    ChatRoom(
-      name: '동국반점',
-      profileImage: '',
-      members: 1,
-      remainingTime: 400,
-    ),
-  ];
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseAuth _authentication = FirebaseAuth.instance;
 
+  Future<String?> _getCurrentUserId() async {
+    User? user = _authentication.currentUser;
+    if (user != null) {
+      return user.uid;
+    }
+    return null;
+  }
+
+  Stream<List<ChatRoom>> _getChatRoomsStream() {
+    return _db.collection('chatRooms').snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        var data = doc.data() as Map<String, dynamic>;
+        return ChatRoom(
+          name: data['name'],
+          makerId: data['makerId'],
+          category: data['category'],
+          foodName: data['foodName'],
+          members: data['members'],
+          remainingTime: data['remainingTime'],
+        );
+      }).toList();
+    });
+  }
+  Future<void> _showCreateChatRoomDialog() async {
+    TextEditingController categoryController = TextEditingController();
+    TextEditingController foodNameController = TextEditingController();
+    TextEditingController timerController = TextEditingController();
+
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('채팅방 생성'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField(
+                items: ['한식', '중식', '양식', '일식'].map((category) {
+                  return DropdownMenuItem(
+                    value: category,
+                    child: Text(category),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  // 선택한 음식 카테고리 처리
+                  categoryController.text = value.toString();
+                },
+                decoration: InputDecoration(labelText: '음식 카테고리'),
+              ),
+              TextFormField(
+                controller: foodNameController,
+                decoration: InputDecoration(labelText: '음식 이름'),
+              ),
+              TextFormField(
+                controller: timerController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(labelText: '타이머 설정 (초)'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+                // 입력 받은 값으로 채팅방 생성
+                _createChatRoom(
+                  categoryController.text,
+                  foodNameController.text,
+                  int.tryParse(timerController.text) ?? 0,
+                );
+
+                Navigator.of(context).pop();
+              },
+              child: Text('생성'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  void _createChatRoom(String category, String foodName, int timerSeconds) async {
+    String? userId = await _getCurrentUserId();
+    ChatRoom newChatRoom = ChatRoom(
+      name: '$category - $foodName',
+      makerId: userId!,
+      category: category,
+      foodName: foodName,
+      members: 0,
+      remainingTime: timerSeconds,
+    );
+    await _db.collection('chatRooms').add({
+      'name': newChatRoom.name,
+      'makerId': newChatRoom.makerId,
+      'category': newChatRoom.category,
+      'foodName': newChatRoom.foodName,
+      'members': newChatRoom.members,
+      'remainingTime': newChatRoom.remainingTime,
+    });
+
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,7 +145,7 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
-              // 채팅방 생성
+              _showCreateChatRoomDialog();
             },
           ),
         ],
@@ -95,10 +153,26 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              itemCount: chatRooms.length,
-              itemBuilder: (context, index) {
-                return ChatRoomListItem(chatRoom: chatRooms[index]);
+            child: StreamBuilder<List<ChatRoom>>(
+              stream: _getChatRoomsStream(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  List<ChatRoom> chatRooms = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: chatRooms.length,
+                    itemBuilder: (context, index) {
+                      return ChatRoomListItem(chatRoom: chatRooms[index]);
+                    },
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text('데이터를 불러오는 중 오류가 발생했습니다.'),
+                  );
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
               },
             ),
           ),
@@ -111,14 +185,18 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
 
 class ChatRoom {
   final String name;
-  final String profileImage;
+  final String makerId;
+  final String category;
+  final String foodName;
   final int members;
   late Timer timer;
   late int remainingTime;
 
   ChatRoom({
     required this.name,
-    required this.profileImage,
+    required this.makerId,
+    required this.category,
+    required this.foodName,
     required this.members,
     required this.remainingTime,
   }) {
@@ -144,8 +222,21 @@ class ChatRoomListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: CircleAvatar(
-        backgroundImage: AssetImage(chatRoom.profileImage),
+      leading: FutureBuilder(
+        future: _getUserProfileImage(chatRoom.makerId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircleAvatar(); // 대기 중에 기본 이미지 또는 로딩 스피너 표시
+          }
+          if (snapshot.hasError) {
+            return CircleAvatar(); // 오류 발생 시 기본 이미지 표시
+          }
+
+          String? profileImage = snapshot.data as String?;
+          return CircleAvatar(
+            backgroundImage: profileImage != null ? NetworkImage(profileImage) : null,
+          );
+        },
       ),
       title: Text(chatRoom.name),
       subtitle: Column(
@@ -169,6 +260,19 @@ class ChatRoomListItem extends StatelessWidget {
         // 채팅방 터치
       },
     );
+  }
+
+  Future<String?> _getUserProfileImage(String userId) async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+      await FirebaseFirestore.instance.collection('user').doc(userId).get();
+      if (userSnapshot.exists) {
+        return userSnapshot.data()?['profile_image'];
+      }
+    } catch (e) {
+      print('Error fetching user profile image: $e');
+    }
+    return null;
   }
 }
 

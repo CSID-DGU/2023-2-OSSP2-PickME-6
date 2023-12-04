@@ -23,6 +23,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     getCurrentUser();
+    checkTeamFormationPermission();
   }
 
   void getCurrentUser() {
@@ -31,7 +32,6 @@ class _ChatScreenState extends State<ChatScreen> {
       if (user != null) {
         loggedUser = user;
         print(loggedUser!.email);
-        checkTeamFormationPermission();
       }
     } catch (e) {
       print(e);
@@ -42,7 +42,7 @@ class _ChatScreenState extends State<ChatScreen> {
     DocumentSnapshot<Map<String, dynamic>> chatRoomDoc =
     await FirebaseFirestore.instance.collection('chatRooms').doc(widget.documentId).get();
 
-    List<dynamic> users = chatRoomDoc['users'];
+    List<dynamic> users = chatRoomDoc['users'] ?? [];
 
     if (users.isNotEmpty && loggedUser?.uid == users[0]) {
       setState(() {
@@ -50,22 +50,20 @@ class _ChatScreenState extends State<ChatScreen> {
       });
     }
 
-    // StreamBuilder를 통해 실시간으로 데이터 감시
     FirebaseFirestore.instance.collection('chatRooms').doc(widget.documentId).snapshots().listen((snapshot) {
       if (snapshot.exists) {
         setState(() {
           isTeamFormed = snapshot['isTeamFormed'] ?? false;
         });
 
-        // 여기서 성사 버튼 상태를 갱신합니다.
         if (snapshot['isTeamFormed'] == true) {
           setState(() {
             hasTeamFormationPermission = true;
           });
         }
         if (snapshot['acceptedCount'] == snapshot['members']) {
-          _deleteChatRoom(widget.documentId);
-          Navigator.of(context).pop();
+            _deleteChatRoom(widget.documentId);
+            Navigator.of(context).pop();
         }
       }
     });

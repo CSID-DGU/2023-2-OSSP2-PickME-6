@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:ossp_pickme/main.dart';
 
 class MatchingPage extends StatefulWidget {
   const MatchingPage({Key? key}) : super(key: key);
@@ -69,7 +70,7 @@ class _MatchingState extends State<MatchingPage> {
     return Scaffold(
       appBar: AppBar(
         title: SizedBox.shrink(),
-      ),
+          leading: Container(),),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -266,10 +267,4 @@ class _CountdownTimerWidgetState extends State<CountdownTimerWidget> {
   String formatDuration(Duration duration) {
     return '${(duration.inMinutes % 60).toString().padLeft(2, '0')}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: MatchingPage(),
-  ));
 }

@@ -17,9 +17,24 @@ class _LoginPageState extends State<LoginPage> {
   final _authentication = FirebaseAuth.instance;
   bool _showSignUp = true;
 
-  @override
-  Future<void> resetPassword(String email) async {
-    await _authentication.sendPasswordResetEmail(email: email);
+  Future<void> _resetPassword(String email) async {
+    try {
+      await _authentication.sendPasswordResetEmail(email: email);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('비밀번호 재설정 이메일을 보냈습니다. 이메일을 확인해주세요.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('이메일을 확인하고 다시 시도해주세요.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -143,7 +158,7 @@ class _LoginPageState extends State<LoginPage> {
             if (!_showSignUp)
               GestureDetector(
                 onTap: () {
-                  // 비밀번호 재설정 코드 넣기!
+                  _resetPassword(_idController.text);
                 },
                 child: Column(
                   children: [

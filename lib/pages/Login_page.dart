@@ -18,6 +18,11 @@ class _LoginPageState extends State<LoginPage> {
   bool _showSignUp = true;
 
   @override
+  Future<void> resetPassword(String email) async {
+    await _authentication.sendPasswordResetEmail(email: email);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

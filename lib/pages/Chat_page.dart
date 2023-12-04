@@ -50,6 +50,10 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
         if (remainingTime <= 0) {
           return null;
         }
+        else if(data['members'] == 0){
+          _db.collection('chatRooms').doc(doc.id).delete();
+          return null;
+        }
 
         return ChatRoom(
           makerId: data['makerId'],
@@ -143,6 +147,7 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
       'members': newChatRoom.members,
       'timerStartTime': newChatRoom.timerStartTime, // 서버에 타이머 시작 시간 저장
       'timerSetTime': newChatRoom.timerSetTime, // 서버에 타이머 설정 시간 저장
+      'users': FieldValue.arrayUnion([userId]),
     });
   }
 
@@ -221,6 +226,8 @@ class ChatRoomListItem extends StatefulWidget {
 }
 
 class _ChatRoomListItemState extends State<ChatRoomListItem> {
+  late FirebaseFirestore _db = FirebaseFirestore.instance;
+  late FirebaseAuth _authentication = FirebaseAuth.instance;
   late Future<String?> _profileImageFuture;
   Timer? _timer;
   @override
@@ -262,6 +269,30 @@ class _ChatRoomListItemState extends State<ChatRoomListItem> {
       },
     );
   }
+  void _enterChatRoom() async{
+    String? userId = await _authentication.currentUser!.uid;
+    DocumentSnapshot<Map<String, dynamic>> chatRoomDoc = await _db.collection('chatRooms').doc(widget.chatRoom.makerId).get();
+
+    // 해당 채팅방의 users 배열을 가져온다
+    List<dynamic> users = chatRoomDoc['users'];
+
+    // 현재 사용자의 UID가 users 배열에 없으면 추가하고 members를 1 증가시킨다
+    if (!users.contains(userId)) {
+      users.add(userId);
+
+      // 채팅방에 현재 사용자의 uid를 추가하고 members를 1 증가시킴
+      await _db.collection('chatRooms').doc(widget.chatRoom.makerId).update({
+        'members': FieldValue.increment(1),
+        'users': users,
+      });
+    }
+    navigatorKey.currentState?.push(
+      MaterialPageRoute(
+        builder: (context) => ChatScreen(documentId: widget.chatRoom.makerId),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -291,12 +322,7 @@ class _ChatRoomListItemState extends State<ChatRoomListItem> {
       trailing: ElevatedButton(
         onPressed: () {
           if(widget.chatRoom.remainingTime >0 ) {
-            navigatorKey.currentState?.push(
-              MaterialPageRoute(
-                builder: (context) => ChatScreen(documentId: widget.chatRoom.makerId),
-              ),
-
-            );
+            _enterChatRoom();
           }
           else {
             _showEntryNotAllowedDialog();

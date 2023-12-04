@@ -4,11 +4,11 @@ import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_8.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 class ChatBubbles extends StatelessWidget {
-  ChatBubbles(this.message, this.isMe, this.userImage, {Key? key}):super(key:key);
+  ChatBubbles(this.message, this.isMe, this.userId, {Key? key}):super(key:key);
 
   final String message;
   final bool isMe;
-  final String userImage; //userID를 받아와 실시간 이미지로 반환
+  final String userId; //userID를 받아와 실시간 이미지로 반환
 
 
   Future<String?> _getUserProfileImage(String userId) async {
@@ -40,7 +40,7 @@ class ChatBubbles extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _getUserNickName(userImage),
+      future: _getUserNickName(userId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator(); // 대기 중에 로딩 스피너 표시
@@ -132,7 +132,7 @@ class ChatBubbles extends StatelessWidget {
               right: isMe ? 5 : null,
               left: isMe ? null : 5,
               child: FutureBuilder(
-                future: _getUserProfileImage(userImage),
+                future: _getUserProfileImage(userId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircleAvatar(); // 대기 중에 기본 이미지 또는 로딩 스피너 표시

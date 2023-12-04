@@ -43,12 +43,18 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
     return _db.collection('chatRooms').snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
         var data = doc.data() as Map<String, dynamic>;
+        int timerStartTime = data['timerStartTime'];
+        int timerSetTime = data['timerSetTime'];
+        int currentTime = DateTime.now().millisecondsSinceEpoch;
+        int remainingTime = timerSetTime - (currentTime - timerStartTime) ~/ 1000; // 남은 시간 계산
         return ChatRoom(
           makerId: data['makerId'],
           category: data['category'],
           foodName: data['foodName'],
           members: data['members'],
-          remainingTime: data['remainingTime'],
+          remainingTime: remainingTime > 0 ? remainingTime : 0,
+          timerStartTime: timerStartTime, // 수정: 필드 추가
+          timerSetTime: timerSetTime,
         );
       }).toList();
     });
@@ -121,7 +127,9 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
       makerId: userId!,
       category: category,
       foodName: foodName,
-      members: 0,
+      members: 1,
+      timerStartTime: DateTime.now().millisecondsSinceEpoch, // 타이머 시작 시간 추가
+      timerSetTime: timerSeconds,
       remainingTime: timerSeconds,
     );
     await _db.collection('chatRooms').doc(newChatRoom.makerId).set({
@@ -129,10 +137,13 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
       'category': newChatRoom.category,
       'foodName': newChatRoom.foodName,
       'members': newChatRoom.members,
-      'remainingTime': newChatRoom.remainingTime,
+      'timerStartTime': newChatRoom.timerStartTime, // 서버에 타이머 시작 시간 저장
+      'timerSetTime': newChatRoom.timerSetTime, // 서버에 타이머 설정 시간 저장
     });
-
   }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -185,7 +196,8 @@ class ChatRoom {
   final String category;
   final String foodName;
   final int members;
-  late Timer timer;
+  final int timerStartTime; // 추가: 타이머 시작 시간
+  final int timerSetTime;
   late int remainingTime;
 
   ChatRoom({
@@ -194,58 +206,75 @@ class ChatRoom {
     required this.foodName,
     required this.members,
     required this.remainingTime,
-  }) {
-    startTimer();
-  }
-
-  void startTimer() {
-    timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if (remainingTime > 0) {
-        remainingTime--;
-      } else {
-        timer.cancel();
-      }
-    });
-  }
+    required this.timerStartTime, // 수정: 필드 추가
+    required this.timerSetTime, // 수정: 필드 추가
+  });
 }
 
-class ChatRoomListItem extends StatelessWidget {
+class ChatRoomListItem extends StatefulWidget {
   final ChatRoom chatRoom;
 
   ChatRoomListItem({required this.chatRoom});
 
   @override
+  _ChatRoomListItemState createState() => _ChatRoomListItemState();
+}
+
+class _ChatRoomListItemState extends State<ChatRoomListItem> {
+  late Future<String?> _profileImageFuture;
+  Timer? _timer;
+  @override
+  void initState() {
+    super.initState();
+    _profileImageFuture = _getUserProfileImage(widget.chatRoom.makerId);
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (widget.chatRoom.remainingTime > 0) {
+          widget.chatRoom.remainingTime--;
+        } else {
+          timer.cancel();
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: FutureBuilder(
-        future: _getUserProfileImage(chatRoom.makerId),
+      leading: FutureBuilder<String?>(
+        future: _profileImageFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircleAvatar(); // 대기 중에 기본 이미지 또는 로딩 스피너 표시
+            return CircleAvatar();
           }
           if (snapshot.hasError) {
-            return CircleAvatar(); // 오류 발생 시 기본 이미지 표시
+            return CircleAvatar();
           }
-
-          String? profileImage = snapshot.data as String?;
+          String? profileImage = snapshot.data;
           return CircleAvatar(
             backgroundImage: profileImage != null ? NetworkImage(profileImage) : null,
           );
         },
       ),
-      title: Text('[${chatRoom.category}]${chatRoom.foodName}'),
+      title: Text('[${widget.chatRoom.category}]${widget.chatRoom.foodName}'),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('남은 시간: ${chatRoom.remainingTime ~/ 60}분 ${chatRoom.remainingTime % 60}초'),
-          Text('${chatRoom.members}명이 참여 중'),
+          Text('남은 시간: ${widget.chatRoom.remainingTime ~/ 60}분 ${widget.chatRoom.remainingTime % 60}초'),
+          Text('${widget.chatRoom.members}명이 참여 중'),
         ],
       ),
       trailing: ElevatedButton(
         onPressed: () {
           navigatorKey.currentState?.push(
             MaterialPageRoute(
-              builder: (context) => ChatScreen(documentId: chatRoom.makerId),
+              builder: (context) => ChatScreen(documentId: widget.chatRoom.makerId),
             ),
           );
         },
@@ -257,17 +286,10 @@ class ChatRoomListItem extends StatelessWidget {
     );
   }
 
-  Future<String?> _getUserProfileImage(String userId) async {
-    try {
-      DocumentSnapshot<Map<String, dynamic>> userSnapshot =
-      await FirebaseFirestore.instance.collection('user').doc(userId).get();
-      if (userSnapshot.exists) {
-        return userSnapshot.data()?['profile_image'];
-      }
-    } catch (e) {
-      print('Error fetching user profile image: $e');
-    }
-    return null;
+  Future<String?> _getUserProfileImage(String userId) {
+    return FirebaseFirestore.instance.collection('user').doc(userId).get().then((snapshot) {
+      return snapshot.data()?['profile_image'];
+    });
   }
 }
 

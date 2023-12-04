@@ -7,6 +7,7 @@ import 'package:ossp_pickme/pages/MyInfo_page.dart';
 import 'package:ossp_pickme/pages/Home_page.dart';
 import 'package:ossp_pickme/pages/Match_page.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 

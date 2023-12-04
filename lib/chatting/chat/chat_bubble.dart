@@ -8,7 +8,7 @@ class ChatBubbles extends StatelessWidget {
 
   final String message;
   final bool isMe;
-  final String userId; //userID를 받아와 실시간 이미지로 반환
+  final String userId;
 
 
   Future<String?> _getUserProfileImage(String userId) async {
@@ -43,10 +43,10 @@ class ChatBubbles extends StatelessWidget {
       future: _getUserNickName(userId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // 대기 중에 로딩 스피너 표시
+          return CircularProgressIndicator();
         }
         if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}'); // 오류 발생 시 에러 메시지 표시
+          return Text('Error: ${snapshot.error}');
         }
       String nickName = snapshot.data as String? ?? '';
       return Stack(
@@ -135,10 +135,10 @@ class ChatBubbles extends StatelessWidget {
                 future: _getUserProfileImage(userId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircleAvatar(); // 대기 중에 기본 이미지 또는 로딩 스피너 표시
+                    return CircleAvatar();
                   }
                   if (snapshot.hasError) {
-                    return CircleAvatar(); // 오류 발생 시 기본 이미지 표시
+                    return CircleAvatar();
                   }
 
                   String? profileImage = snapshot.data as String?;

@@ -47,6 +47,10 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
         int timerSetTime = data['timerSetTime'];
         int currentTime = DateTime.now().millisecondsSinceEpoch;
         int remainingTime = timerSetTime - (currentTime - timerStartTime) ~/ 1000; // 남은 시간 계산
+        if (remainingTime <= 0) {
+          return null;
+        }
+
         return ChatRoom(
           makerId: data['makerId'],
           category: data['category'],
@@ -56,7 +60,7 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
           timerStartTime: timerStartTime, // 수정: 필드 추가
           timerSetTime: timerSetTime,
         );
-      }).toList();
+      }).where((chatRoom) => chatRoom != null).cast<ChatRoom>().toList();
     });
   }
   Future<void> _showCreateChatRoomDialog() async {
@@ -158,34 +162,30 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder<List<ChatRoom>>(
-              stream: _getChatRoomsStream(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  List<ChatRoom> chatRooms = snapshot.data!;
-                  return ListView.builder(
-                    itemCount: chatRooms.length,
-                    itemBuilder: (context, index) {
-                      return ChatRoomListItem(chatRoom: chatRooms[index]);
-                    },
-                  );
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text('데이터를 불러오는 중 오류가 발생했습니다.'),
-                  );
-                } else {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-              },
-            ),
-          ),
-          AdvertisementItem(),
-        ],
+      body: StreamBuilder<List<ChatRoom>>(
+        stream: _getChatRoomsStream(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('데이터를 불러오는 중 오류가 발생했습니다.'));
+          }
+
+          List<ChatRoom>? chatRooms = snapshot.data;
+
+          if (chatRooms == null || chatRooms.isEmpty) {
+            return Center(child: Text('채팅방이 없습니다.'));
+          }
+
+          return ListView.builder(
+            itemCount: chatRooms.length,
+            itemBuilder: (context, index) {
+              return ChatRoomListItem(chatRoom: chatRooms[index]);
+            },
+          );
+        },
       ),
     );
   }
@@ -196,7 +196,7 @@ class ChatRoom {
   final String category;
   final String foodName;
   final int members;
-  final int timerStartTime; // 추가: 타이머 시작 시간
+  final int timerStartTime;
   final int timerSetTime;
   late int remainingTime;
 
@@ -206,8 +206,8 @@ class ChatRoom {
     required this.foodName,
     required this.members,
     required this.remainingTime,
-    required this.timerStartTime, // 수정: 필드 추가
-    required this.timerSetTime, // 수정: 필드 추가
+    required this.timerStartTime,
+    required this.timerSetTime,
   });
 }
 
@@ -243,7 +243,25 @@ class _ChatRoomListItemState extends State<ChatRoomListItem> {
     _timer?.cancel();
     super.dispose();
   }
-
+  void _showEntryNotAllowedDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('입장 제한'),
+          content: Text('이 채팅방은 이미 팀 매칭이 종료되었습니다.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -272,11 +290,17 @@ class _ChatRoomListItemState extends State<ChatRoomListItem> {
       ),
       trailing: ElevatedButton(
         onPressed: () {
-          navigatorKey.currentState?.push(
-            MaterialPageRoute(
-              builder: (context) => ChatScreen(documentId: widget.chatRoom.makerId),
-            ),
-          );
+          if(widget.chatRoom.remainingTime >0 ) {
+            navigatorKey.currentState?.push(
+              MaterialPageRoute(
+                builder: (context) => ChatScreen(documentId: widget.chatRoom.makerId),
+              ),
+
+            );
+          }
+          else {
+            _showEntryNotAllowedDialog();
+          }
         },
         child: Text('입장'),
       ),

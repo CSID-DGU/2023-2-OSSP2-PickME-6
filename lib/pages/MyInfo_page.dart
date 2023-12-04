@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:ossp_pickme/pages/MatchRecord_page.dart';
 import 'package:ossp_pickme/pages/Login_page.dart';
 import 'package:ossp_pickme/pages/Inquiry_page.dart';
+import 'package:ossp_pickme/pages/ReviewManage_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'add_image.dart';
@@ -22,30 +23,33 @@ class _MyInfoState extends State<MyInfoPage> {
 
   String _profileImage = 'assets/silhouette_image.jpg'; // 기본 이미지 경로
   String _nickname = '';
-
+  String _university = '';
+  String _userName = '';
 
   @override
   void initState() {
     super.initState();
-    // 페이지가 생성될 때 닉네임을 Firestore에서 가져와서 업데이트
-    _fetchNickname();
+    // 페이지가 생성될 때 닉네임 및 사용자 정보를 Firestore에서 가져와서 업데이트
+    _fetchUserInfo();
   }
 
-  Future<void> _fetchNickname() async {
+  Future<void> _fetchUserInfo() async {
     try {
       User? user = _authentication.currentUser;
 
       if (user != null) {
-        // Firestore에서 닉네임 가져오기
+        // Firestore에서 사용자 정보 가져오기
         DocumentSnapshot<Map<String, dynamic>> snapshot = await _firestore.collection('user').doc(user.uid).get();
 
-        // 가져온 닉네임을 상태에 반영
+        // 가져온 정보를 상태에 반영
         setState(() {
           _nickname = snapshot['nickName'] ?? '';
+          _university = snapshot['university'] ?? '';
+          _userName = snapshot['userName'] ?? '';
         });
       }
     } catch (e) {
-      print('닉네임을 가져오는 동안 오류 발생: $e');
+      print('사용자 정보를 가져오는 동안 오류 발생: $e');
     }
   }
 
@@ -122,7 +126,7 @@ class _MyInfoState extends State<MyInfoPage> {
                       width: 135,
                       height: 25,
                       child: Text(
-                        '동국대 서울캠퍼스',
+                        _university,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 14,
@@ -141,7 +145,7 @@ class _MyInfoState extends State<MyInfoPage> {
                       width: 92.28,
                       height: 20,
                       child: Text(
-                        '실명',
+                        _userName,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 14,
@@ -215,18 +219,26 @@ class _MyInfoState extends State<MyInfoPage> {
                   Positioned(
                     left: 234.54,
                     top: 156.53,
-                    child: SizedBox(
-                      width: 92.28,
-                      height: 25,
-                      child: Text(
-                        '리뷰관리',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          height: 0,
-                          letterSpacing: -0.30,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ReviewManagementPage()),
+                        );
+                      },
+                      child: SizedBox(
+                        width: 92.28,
+                        height: 25,
+                        child: Text(
+                          '리뷰관리',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            height: 0,
+                            letterSpacing: -0.30,
+                          ),
                         ),
                       ),
                     ),

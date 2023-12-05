@@ -137,6 +137,8 @@ class MatchingDialog extends StatelessWidget {
 
 
 
+
+//구버전 ui
 // GridView.count(
 //         scrollDirection: Axis.vertical,
 //           crossAxisCount: 2,
@@ -200,11 +202,5 @@ class MatchingDialog extends StatelessWidget {
 //           ]
 //           ),
 //         ),
-        
-          
-
-
 //           ],
-
-
 //       )

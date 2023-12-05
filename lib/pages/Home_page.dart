@@ -294,8 +294,13 @@ class _HomePageState extends State<HomePage> {
      '한식',
      '중식',
      '양식',
+     '일식',
+     '분식',
   ];
 
+   String recommendedMenu = getRandomMenu(_menus);
+   String result = "$recommendedMenu 어때요?";
+    
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -314,17 +319,11 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  "한식",
+                  "$result",
                 ),
               ],
             ),
             actions: <Widget>[
-              TextButton(
-                child: Text("다른 메뉴"),
-                onPressed: () {
-                  
-                },
-              ),
               TextButton(
                 child: Text("확인"),
                 onPressed: () {
@@ -337,3 +336,11 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+
+String getRandomMenu(List<String> menuList) {
+  final random = Random();
+  final randomIndex = random.nextInt(menuList.length);
+
+  // 랜덤으로 선택된 메뉴 반환
+  return menuList[randomIndex];
+}

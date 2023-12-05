@@ -9,7 +9,7 @@ class ChatBubbles extends StatelessWidget {
   final String message;
   final bool isMe;
   final String userId;
-
+  List<String> reportReasons = ['욕설', '기타'];
 
   Future<String?> _getUserProfileImage(String userId) async {
     try {
@@ -131,22 +131,137 @@ class ChatBubbles extends StatelessWidget {
               top: 0,
               right: isMe ? 5 : null,
               left: isMe ? null : 5,
-              child: FutureBuilder(
-                future: _getUserProfileImage(userId),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircleAvatar();
-                  }
-                  if (snapshot.hasError) {
-                    return CircleAvatar();
-                  }
+              child: Row(
+                children: [
+                  FutureBuilder(
+                    future: _getUserProfileImage(userId),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircleAvatar();
+                      }
+                      if (snapshot.hasError) {
+                        return CircleAvatar();
+                      }
 
-                  String? profileImage = snapshot.data as String?;
-                  return CircleAvatar(
-                    backgroundImage: profileImage != null ? NetworkImage(
-                        profileImage) : null,
-                  );
-                },
+                      String? profileImage = snapshot.data as String?;
+                      return CircleAvatar(
+                        backgroundImage: profileImage != null ? NetworkImage(
+                            profileImage) : null,
+                      );
+                    },
+                  ),
+                  SizedBox(width: 2),
+                  if (!isMe)
+                    GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            String selectedReason = reportReasons[0]; // 초기값 설정
+                            TextEditingController detailedReasonController =
+                            TextEditingController();
+                            return SingleChildScrollView(
+                              child: AlertDialog(
+                                title: Text('신고'),
+                                content: Container(
+                                  height : 200,
+                                  width: 200,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('신고 사유를 선택하세요'),
+                                      DropdownButton<String>(
+                                        value: selectedReason,
+                                        onChanged: (String? newValue) {
+                                          if (newValue != null) {
+                                            selectedReason = newValue;
+                                          }
+                                        },
+                                        items: reportReasons
+                                            .map<DropdownMenuItem<String>>(
+                                              (String value) =>
+                                              DropdownMenuItem<String>(
+                                                value: value,
+                                                child: Text(value),
+                                              ),
+                                        ).toList(),
+                                      ),
+                                      SizedBox(height: 10),
+                                      Text('상세한 내용을 입력하세요'),
+                                      Container(
+                                        height: 100, // 텍스트 박스 높이 조절
+                                        padding: EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: TextFormField(
+                                          controller: detailedReasonController,
+                                          maxLines: 5,
+                                          maxLength : 100,
+                                          decoration: InputDecoration.collapsed(
+                                            hintText: '상세한 내용 입력',
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('취소'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text('경고'),
+                                            content: Text(
+                                                '채팅 기록이 수집될 수 있습니다. 신고하시겠습니까?'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Text('아니요'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () async {
+                                                  await FirebaseFirestore.instance.collection('report').add({
+                                                    'reportedId' : ' ',
+                                                    'category' : selectedReason,
+                                                    'reportcontent' : detailedReasonController.text,
+                                                  });
+                                                  Navigator.of(context).pop();
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Text('예'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Text('신고'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      child: Icon(
+                        Icons.report,
+                        size: 18,
+                        color: Colors.black, // You can customize the color
+                      ),
+                    ),
+                ],
               ),
             )
           ]

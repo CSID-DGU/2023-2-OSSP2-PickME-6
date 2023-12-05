@@ -11,9 +11,48 @@ const WesternFood({Key? key}) : super(key: key);
 class _WesternState extends State<WesternFood> {
   @override
   Widget build(BuildContext context) {
-    return Text(
-      '양식입니다',
-      style: TextStyle(fontSize: 40),
+   return Scaffold(
+      appBar: AppBar(
+        title: const Text('양식'),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        elevation: 1,
+      ),
+      body: ListView(
+scrollDirection: Axis.vertical,
+children: <Widget>[
+ ListTile(leading: Icon(Icons.food_bank),
+ title: Text('파스타'),
+ trailing: Icon(Icons.navigate_next),
+ onTap: () {
+   
+ },
+ ),
+ ListTile(leading: Icon(Icons.food_bank),
+ title: Text('피자'),
+ trailing: Icon(Icons.navigate_next),
+ onTap: () {
+   
+ },
+ ),
+  ListTile(leading: Icon(Icons.food_bank),
+ title: Text('햄버거'),
+ trailing: Icon(Icons.navigate_next),
+ onTap: () {
+   
+ },
+ ),
+  ListTile(leading: Icon(Icons.food_bank),
+ title: Text('기타 음식'),
+ trailing: Icon(Icons.navigate_next),
+ onTap: () {
+   
+ },
+ ),
+],
+
+      ),
     );
   }
 

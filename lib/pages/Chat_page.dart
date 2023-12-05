@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../chatting/chat/chat_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);
 
@@ -31,6 +32,12 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _authentication = FirebaseAuth.instance;
 
+  @override
+  void initState(){
+    super.initState();
+    getLocationPermission();
+  }
+
   Future<String?> _getCurrentUserId() async {
     User? user = _authentication.currentUser;
     if (user != null) {
@@ -38,6 +45,19 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
     }
     return null;
   }
+  Future<void> getLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      await Geolocator.requestPermission();
+    }
+  }
+
+  Future<Position> getCurrentLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    return position;
+  }
+
 
   Stream<List<ChatRoom>> _getChatRoomsStream() {
     return _db.collection('chatRooms').snapshots().map((snapshot) {
@@ -56,6 +76,8 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
         }
 
         return ChatRoom(
+          latitude: data['latitude'],
+          longitude: data['longitude'],
           makerId: data['makerId'],
           category: data['category'],
           foodName: data['foodName'],
@@ -131,7 +153,11 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
   }
   void _createChatRoom(String category, String foodName, int timerSeconds) async {
     String? userId = await _getCurrentUserId();
+    Position position = await getCurrentLocation();
+
     ChatRoom newChatRoom = ChatRoom(
+      latitude: position.latitude,
+      longitude: position.longitude,
       makerId: userId!,
       category: category,
       foodName: foodName,
@@ -141,6 +167,8 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
       remainingTime: timerSeconds,
     );
     await _db.collection('chatRooms').doc(newChatRoom.makerId).set({
+      'latitude': newChatRoom.latitude,
+      'longitude': newChatRoom.longitude,
       'makerId': newChatRoom.makerId,
       'category': newChatRoom.category,
       'foodName': newChatRoom.foodName,
@@ -197,6 +225,8 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
 }
 
 class ChatRoom {
+  final double latitude;
+  final double longitude;
   final String makerId;
   final String category;
   final String foodName;
@@ -206,6 +236,8 @@ class ChatRoom {
   late int remainingTime;
 
   ChatRoom({
+    required this.latitude,
+    required this.longitude,
     required this.makerId,
     required this.category,
     required this.foodName,
@@ -273,14 +305,11 @@ class _ChatRoomListItemState extends State<ChatRoomListItem> {
     String? userId = await _authentication.currentUser!.uid;
     DocumentSnapshot<Map<String, dynamic>> chatRoomDoc = await _db.collection('chatRooms').doc(widget.chatRoom.makerId).get();
 
-    // 해당 채팅방의 users 배열을 가져온다
     List<dynamic> users = chatRoomDoc['users'];
 
-    // 현재 사용자의 UID가 users 배열에 없으면 추가하고 members를 1 증가시킨다
     if (!users.contains(userId)) {
       users.add(userId);
 
-      // 채팅방에 현재 사용자의 uid를 추가하고 members를 1 증가시킴
       await _db.collection('chatRooms').doc(widget.chatRoom.makerId).update({
         'members': FieldValue.increment(1),
         'users': users,

@@ -26,35 +26,70 @@ children: <Widget>[
  title: Text('마라탕'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   showDialog(
+  context: context,
+  builder: (BuildContext context) {
+    return MatchingDialog(
+                      
+    );
+    },
+  );
  },
  ),
  ListTile(leading: Icon(Icons.food_bank),
  title: Text('짜장면'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   showDialog(
+  context: context,
+  builder: (BuildContext context) {
+    return MatchingDialog(
+                      
+    );
+    },
+  );
  },
  ),
   ListTile(leading: Icon(Icons.food_bank),
  title: Text('짬뽕'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   showDialog(
+  context: context,
+  builder: (BuildContext context) {
+    return MatchingDialog(
+                      
+    );
+    },
+  );
  },
  ),
   ListTile(leading: Icon(Icons.food_bank),
  title: Text('탕수육'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   showDialog(
+  context: context,
+  builder: (BuildContext context) {
+    return MatchingDialog(
+                      
+    );
+    },
+  );
  },
  ),
   ListTile(leading: Icon(Icons.food_bank),
  title: Text('기타 중식'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   showDialog(
+  context: context,
+  builder: (BuildContext context) {
+    return MatchingDialog(
+                      
+    );
+    },
+  );
  },
  ),
 ],
@@ -62,6 +97,43 @@ children: <Widget>[
     );
   }
 }
+
+class MatchingDialog extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            //음식점 찾기 기능 추가
+           Text('주변에 음식점1, 음식점 2가 있습니다!'),
+           SizedBox(height: 16),
+           Text('바로 매칭하러 갈까요?'),
+            ElevatedButton(
+              onPressed: (){
+                //매칭 바로 선택되도록 이동하기 
+              }, 
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF2B4177), 
+              ),
+              child: Text(
+              'Matching',
+               style: TextStyle(
+                color: Colors.white,
+                ),
+              ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+}
+
 
 
 

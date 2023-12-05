@@ -41,8 +41,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-   return Container(
-    child: Column(
+   return ListView(
       children: <Widget>[
     //랜덤 메뉴 추천
     Stack(
@@ -286,7 +285,6 @@ class _HomePageState extends State<HomePage> {
     ),
     //광고 슬라이더 끝
    ],
-   ),
    );
   }
   

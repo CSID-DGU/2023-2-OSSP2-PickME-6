@@ -31,11 +31,11 @@ class ChatRoomListPage extends StatefulWidget {
 class _ChatRoomListPageState extends State<ChatRoomListPage> {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _authentication = FirebaseAuth.instance;
-
+  late Future<Position> position;
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    getLocationPermission();
+    position = getCurrentLocation();
   }
 
   Future<String?> _getCurrentUserId() async {
@@ -45,29 +45,27 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
     }
     return null;
   }
-  Future<void> getLocationPermission() async {
+
+  Future<Position> getCurrentLocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       await Geolocator.requestPermission();
     }
-  }
-
-  Future<Position> getCurrentLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
+    return await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-    return position;
   }
 
 
-  Stream<List<ChatRoom>> _getChatRoomsStream() {
+  Stream<List<ChatRoom>> _getChatRoomsStream(Position userLocation) {
     return _db.collection('chatRooms').snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
         var data = doc.data() as Map<String, dynamic>;
         int timerStartTime = data['timerStartTime'];
         int timerSetTime = data['timerSetTime'];
         int currentTime = DateTime.now().millisecondsSinceEpoch;
+        double distanceInMeters = Geolocator.distanceBetween(userLocation.latitude, userLocation.longitude, data['latitude'], data['longitude']);
         int remainingTime = timerSetTime - (currentTime - timerStartTime) ~/ 1000; // 남은 시간 계산
-        if (remainingTime <= 0) {
+        if (remainingTime <= 0 || distanceInMeters > 1000) {
           return null;
         }
         else if(data['members'] == 0){
@@ -83,7 +81,7 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
           foodName: data['foodName'],
           members: data['members'],
           remainingTime: remainingTime > 0 ? remainingTime : 0,
-          timerStartTime: timerStartTime, // 수정: 필드 추가
+          timerStartTime: timerStartTime,
           timerSetTime: timerSetTime,
         );
       }).where((chatRoom) => chatRoom != null).cast<ChatRoom>().toList();
@@ -135,7 +133,6 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
             ),
             TextButton(
               onPressed: () {
-                // 입력 받은 값으로 채팅방 생성
                 _createChatRoom(
                   categoryController.text,
                   foodNameController.text,
@@ -154,7 +151,6 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
   void _createChatRoom(String category, String foodName, int timerSeconds) async {
     String? userId = await _getCurrentUserId();
     Position position = await getCurrentLocation();
-
     ChatRoom newChatRoom = ChatRoom(
       latitude: position.latitude,
       longitude: position.longitude,
@@ -195,8 +191,8 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
           ),
         ],
       ),
-      body: StreamBuilder<List<ChatRoom>>(
-        stream: _getChatRoomsStream(),
+      body: FutureBuilder<Position>(
+        future: position,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -206,16 +202,30 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
             return Center(child: Text('데이터를 불러오는 중 오류가 발생했습니다.'));
           }
 
-          List<ChatRoom>? chatRooms = snapshot.data;
+          Position userLocation = snapshot.data!;
+          return StreamBuilder<List<ChatRoom>>(
+            stream: _getChatRoomsStream(userLocation),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
 
-          if (chatRooms == null || chatRooms.isEmpty) {
-            return Center(child: Text('채팅방이 없습니다.'));
-          }
+              if (snapshot.hasError) {
+                return Center(child: Text('데이터를 불러오는 중 오류가 발생했습니다.'));
+              }
 
-          return ListView.builder(
-            itemCount: chatRooms.length,
-            itemBuilder: (context, index) {
-              return ChatRoomListItem(chatRoom: chatRooms[index]);
+              List<ChatRoom>? chatRooms = snapshot.data;
+
+              if (chatRooms == null || chatRooms.isEmpty) {
+                return Center(child: Text('채팅방이 없습니다.'));
+              }
+
+              return ListView.builder(
+                itemCount: chatRooms.length,
+                itemBuilder: (context, index) {
+                  return ChatRoomListItem(chatRoom: chatRooms[index]);
+                },
+              );
             },
           );
         },

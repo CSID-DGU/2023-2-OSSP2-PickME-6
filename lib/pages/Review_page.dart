@@ -30,7 +30,7 @@ class _ReviewPageState extends State<ReviewPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('음식점: ${widget.restaurantName}'),
+            Text('카테고리: ${widget.restaurantName}'),
             Text('메뉴: ${widget.menuName}'),
             Text('주문일시: ${widget.orderDate}'),
             SizedBox(height: 20),

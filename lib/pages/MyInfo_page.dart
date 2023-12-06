@@ -203,7 +203,7 @@ class _MyInfoState extends State<MyInfoPage> {
                         width: 71.77,
                         height: 25,
                         child: Text(
-                          '주문내역',
+                          '매칭기록',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 14,

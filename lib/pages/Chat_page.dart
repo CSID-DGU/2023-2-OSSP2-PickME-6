@@ -55,7 +55,19 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
         desiredAccuracy: LocationAccuracy.high);
   }
 
+  void deleteChatRooms(String roomNum) async{
+    CollectionReference collectionReference = _db.collection('chatRooms').doc(roomNum).collection('chat');
+    try {
+      QuerySnapshot querySnapshot = await collectionReference.get();
+      querySnapshot.docs.forEach((document) {
+        _db.collection('chatRooms').doc(roomNum).collection('chat').doc(document.id).delete();
+      });
+    } catch (e) {
+      print("Error getting documents: $e");
+    }
 
+    _db.collection('chatRooms').doc(roomNum).delete();
+  }
   Stream<List<ChatRoom>> _getChatRoomsStream(Position userLocation) {
     return _db.collection('chatRooms').snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
@@ -69,7 +81,8 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
           return null;
         }
         else if(data['members'] == 0){
-          _db.collection('chatRooms').doc(doc.id).delete();
+          deleteChatRooms(doc.id);
+
           return null;
         }
 
@@ -95,56 +108,60 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
     return showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text('채팅방 생성'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField(
-                items: ['한식', '중식', '일식', '양식', '분식', '기타'].map((category) {
-                  return DropdownMenuItem(
-                    value: category,
-                    child: Text(category),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  // 선택한 음식 카테고리 처리
-                  categoryController.text = value.toString();
-                },
-                decoration: InputDecoration(labelText: '음식 카테고리'),
+        return SingleChildScrollView(
+            child :
+            AlertDialog(
+              title: Text('채팅방 생성'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DropdownButtonFormField(
+                    items: ['한식', '중식', '일식', '양식', '분식', '기타'].map((category) {
+                      return DropdownMenuItem(
+                        value: category,
+                        child: Text(category),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      // 선택한 음식 카테고리 처리
+                      categoryController.text = value.toString();
+                    },
+                    decoration: InputDecoration(labelText: '음식 카테고리'),
+                  ),
+                  TextFormField(
+                    controller: foodNameController,
+                    decoration: InputDecoration(labelText: '음식점 이름'),
+                  ),
+                  TextFormField(
+                    controller: timerController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(labelText: '타이머 설정 (초)'),
+                  ),
+                ],
               ),
-              TextFormField(
-                controller: foodNameController,
-                decoration: InputDecoration(labelText: '음식점 이름'),
-              ),
-              TextFormField(
-                controller: timerController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: '타이머 설정 (초)'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('취소'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('취소'),
+                ),
+                TextButton(
+                  onPressed: ()  async {
+                    String? userId =  await _getCurrentUserId();
+                    _createChatRoom(
+                      categoryController.text,
+                      foodNameController.text,
+                      int.tryParse(timerController.text) ?? 0,
+                    );
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('생성'),
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: () {
-                _createChatRoom(
-                  categoryController.text,
-                  foodNameController.text,
-                  int.tryParse(timerController.text) ?? 0,
-                );
+          );
 
-                Navigator.of(context).pop();
-              },
-              child: Text('생성'),
-            ),
-          ],
-        );
       },
     );
   }

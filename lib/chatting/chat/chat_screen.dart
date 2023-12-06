@@ -189,10 +189,6 @@ class _ChatScreenState extends State<ChatScreen> {
                               'members': FieldValue.increment(-1),
                               'users': FieldValue.arrayRemove([userId]),
                             });
-                            // 성사 버튼을 눌렀을 때의 처리 추가
-                            if (isTeamFormed) {
-                              await _deleteChatRoom(widget.documentId);
-                            }
                             Navigator.of(context).pop();
                             Navigator.of(context).pop();
                           }

@@ -27,16 +27,94 @@ const HomePage({Key? key}) : super(key: key);
 }
 
 class _HomePageState extends State<HomePage> {
- final TextEditingController _filter = TextEditingController();
-  FocusNode focusNode = FocusNode();
-  String _searchText = "";
+  List<FoodLabel> searchHistory = <FoodLabel>[];
 
-  _HomePageState(){
-  _filter.addListener(() {
+  //검색 기록
+  Iterable<Widget> getHistoryList(SearchController controller) {
+    return searchHistory.map(
+      (FoodLabel result) => ListTile(
+        leading: const Icon(Icons.history),
+        title: Text(result.name),
+        trailing: IconButton(
+          icon: const Icon(Icons.call_missed),
+          onPressed: () {
+            controller.text = result.name;
+            controller.selection = TextSelection.collapsed(offset: controller.text.length);
+          },
+        ),
+      ),
+    );
+  }
+
+  //검색 제안
+  Iterable<Widget> getSuggestions(SearchController controller) {
+    final String input = controller.value.text;
+    return FoodLabel.values
+        .where((FoodLabel result) => result.name.contains(input))
+        .map(
+          (FoodLabel filteredFood) => ListTile(
+            title: Text(filteredFood.name),
+            trailing: IconButton(
+              icon: const Icon(Icons.call_missed),
+              onPressed: () {
+                controller.text = filteredFood.name;
+                controller.selection =
+                TextSelection.collapsed(offset: controller.text.length); 
+              },
+            ),
+            onTap: () {
+              controller.closeView(filteredFood.name);
+              handleSelection(filteredFood);
+              //각 카테고리에 맞게 옮기기
+               if(filteredFood.category=='한식'){
+                     Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => KoreanFood()),
+                        );
+                  }
+                else if(filteredFood.category=='중식'){
+                  Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => ChineseFood()),
+                        );
+                }
+                else if(filteredFood.category=='일식'){
+                  Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => JapaneseFood()),
+                        );
+                }
+                else if(filteredFood.category=='양식'){
+                  Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => WesternFood()),
+                        );
+                }
+                else if(filteredFood.category=='분식'){
+                  Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => Snack()),
+                        );
+                }
+                else {
+                  Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => etcFood()),
+                        );
+                }
+            },
+          ),
+        );
+  }
+
+//검색 기록 누적 및 삭제
+void handleSelection(FoodLabel selectedFood) {
     setState(() {
-      _searchText=_filter.text;
+      if (searchHistory.length >= 5) {
+        searchHistory.removeLast();
+      }
+      searchHistory.insert(0, selectedFood);
     });
-  });
   }
 
   @override
@@ -74,74 +152,30 @@ class _HomePageState extends State<HomePage> {
       ],
     ),
     //랜덤 메뉴 추천 끝
-    //검색창
-    Container(
-      color: Colors.white, 
-      padding: EdgeInsets.fromLTRB(5, 10, 5, 10),
-      child: Row(
-        children: <Widget>[
-          Expanded(flex: 6, 
-                   child: TextField(
-                    focusNode: focusNode,
-                    style: TextStyle(
-                      fontSize: 15,
-                    ),
-                    autofocus: true,
-                    controller: _filter,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white12,
-                      prefixIcon: Icon(
-                        Icons.search, 
-                        color: Colors.white60, 
-                        size: 20, 
-                        ),
-                        suffixIcon: focusNode.hasFocus ? IconButton(
-                          icon: Icon(
-                            Icons.cancel, 
-                            size: 20,
-                            ),
-                            onPressed: (){
-                              setState(() {
-                                _filter.clear();
-                                _searchText="";
-                              });
-                            },
-                          )
-                           : Container(),
-                           hintText: 'Search For Food',
-                           labelStyle: TextStyle(color: Colors.white),
-                           focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.transparent),
-                            borderRadius: BorderRadius.all(Radius.circular(10))),
-                           enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.transparent),
-                            borderRadius: BorderRadius.all(Radius.circular(10))),
-                           border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.transparent),
-                            borderRadius: BorderRadius.all(Radius.circular(10))),
-                      ),
-                    ),
+    //여백 주기
+          SizedBox(
+            height: 16,
           ),
-          focusNode.hasFocus 
-          ? Expanded(
-            child: TextButton(
-            child: Text('취소'),
-            onPressed: () {
-              setState(() {
-                _filter.clear();
-                _searchText="";
-                focusNode.unfocus();
-              });
-            },
-            ),
-          )
-          : Expanded(
-            flex: 0,
-            child: Container(),
-            )
-        ],
-      ),
+    //검색창
+    SearchAnchor.bar(
+                barHintText: '먹고싶은 음식을 검색해보세요.',
+                barHintStyle: MaterialStateProperty.all(
+                  TextStyle(color: Colors.grey)
+                ),
+                suggestionsBuilder:
+                    (BuildContext context, SearchController controller) {
+                  if (controller.text.isEmpty) {
+                    if (searchHistory.isNotEmpty) {
+                      return getHistoryList(controller);
+                    }
+                    return <Widget>[
+                      Center(
+                          child: Text('검색 기록이 없어요.'),
+                          ),
+                    ];
+                  }
+                  return getSuggestions(controller);
+                },
     ),
     //검색창 끝
     //여백 주기
@@ -299,8 +333,8 @@ class _HomePageState extends State<HomePage> {
   ];
 
    String recommendedMenu = getRandomMenu(_menus);
-   String result = "$recommendedMenu 어때요?";
-    
+   String result = "$recommendedMenu 어때요?"; 
+
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -343,4 +377,54 @@ String getRandomMenu(List<String> menuList) {
 
   // 랜덤으로 선택된 메뉴 반환
   return menuList[randomIndex];
+}
+
+
+//검색용 메뉴 카테고리
+enum FoodLabel {
+  korea('한식', '감자탕'),
+  korea2('한식', '곱도리탕'),
+  korea3('한식', '국밥'),
+  korea4('한식', '김치찌개'),
+  korea5('한식', '낙곱새'),
+  korea6('한식', '냉면'),
+  korea7('한식', '된장찌개'),
+  korea8('한식', '부대찌개'),
+  korea9('한식', '불고기'),
+  korea10('한식', '비빔밥'),
+  korea11('한식', '설렁탕'),
+  korea12('한식', '수제비'),
+  korea13('한식', '아구찜'),
+  korea14('한식', '족발보쌈'),
+  korea15('한식', '칼국수'),
+  korea16('한식', '해물찜'),
+  korea17('한식', '찜닭'),
+  china('중식', '마라탕'),
+  china2('중식', '짜장면'),
+  china3('중식', '짬뽕'),
+  china4('중식', '탕수육'),
+  japan('일식', '돈카츠'),
+  japan2('일식', '라멘'),
+  japan3('일식', '소바'),
+  japan4('일식', '초밥'),
+  japan5('일식', '타코야끼'),
+  japan6('일식', '회덮밥'),
+  snack('분식', '김밥'),
+  snack2('분식', '라면'),
+  snack3('분식', '순대'),
+  snack4('분식', '튀김'),
+  snack5('분식', '떡볶이'),
+  snack6('분식', '쫄면'),
+  west('양식', '파스타'),
+  west2('양식', '피자'),
+  west3('양식', '햄버거'),
+  etc('기타', '베이글'),
+  etc2('기타', '샌드위치'),
+  etc3('기타', '샐러드'),
+  etc4('기타', '카페'),
+  ;
+
+  const FoodLabel(this.category, this.name);
+  final String category;
+  final String name;
 }

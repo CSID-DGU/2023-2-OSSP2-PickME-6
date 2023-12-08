@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:ossp_pickme/pages/OrderDetail_page.dart';
 import 'package:ossp_pickme/pages/Review_page.dart';
+import 'package:ossp_pickme/pages/Match_page.dart';
+import 'package:ossp_pickme/pages/Inquiry_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MatchRecord extends StatelessWidget {
   const MatchRecord({super.key});
@@ -15,45 +18,36 @@ class MatchRecord extends StatelessWidget {
             Navigator.pop(context); // 뒤로가기 버튼을 눌렀을 때 MyInfoPage로 이동
           },
         ),
-        title: Text('주문내역'),
+        title: Text('매칭기록'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 1,
       ),
-      body: ListView(
-        children: [
-          AdvertisementItem(),
-          MatchingRecord(
-            date: '11. 15(수) · 배달완료',
-            image: '이미지',
-            restaurantName: '라화방마라탕',
-            menuName: '마라탕 1개 + 마라샹궈 1개 + 코카콜라제로 2개',
-          ),
-          MatchingRecord(
-            date: '11. 12(일) · 배달완료',
-            image: '이미지',
-            restaurantName: '동국반점',
-            menuName: '해오름세트',
-          ),
-          MatchingRecord(
-            date: '11. 8(수) · 배달완료',
-            image: '이미지',
-            restaurantName: '행복은간장밥',
-            menuName: '행복한 싱글 SET 1개',
-          ),
-          MatchingRecord(
-            date: '11. 4(토) · 배달완료',
-            image: '이미지',
-            restaurantName: '필동반점',
-            menuName: '간짜장 1개 + 차돌짬뽕 2개',
-          ),
-          MatchingRecord(
-            date: '10. 30(월) · 배달완료',
-            image: '이미지',
-            restaurantName: '동국반점',
-            menuName: 'A세트 1개',
-          ),
-        ],
+      body: FutureBuilder<QuerySnapshot>(
+        // Firestore에서 데이터 가져오기
+        future: FirebaseFirestore.instance.collection('matchingInfo').get(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator(); // 데이터 로딩 중일 때 표시할 UI
+          }
+
+          if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}'); // 오류가 발생한 경우
+          }
+
+          // 데이터 가져오기 성공
+          final data = snapshot.data!.docs;
+
+          return ListView(
+            children: [
+              AdvertisementItem(),
+              for (var document in data)
+                MatchingRecord(
+                  matchingInfo: document,
+                ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -80,20 +74,22 @@ class AdvertisementItem extends StatelessWidget {
 }
 
 class MatchingRecord extends StatelessWidget {
-  final String date;
-  final String image;
-  final String restaurantName;
-  final String menuName;
+  final DocumentSnapshot matchingInfo;
 
   const MatchingRecord({
-    required this.date,
-    required this.image,
-    required this.restaurantName,
-    required this.menuName,
+    required this.matchingInfo,
   });
 
   @override
   Widget build(BuildContext context) {
+    String category = matchingInfo['category'] ?? '';
+    String food = matchingInfo['food'] ?? '';
+    Timestamp timestamp = matchingInfo['timestamp'] ?? Timestamp.now();
+
+    // Timestamp를 DateTime으로 변환
+    DateTime date = timestamp.toDate();
+    String formattedDate = '${date.year}. ${date.month}. ${date.day}';
+
     return Column(
       children: [
         Container(
@@ -118,7 +114,7 @@ class MatchingRecord extends StatelessWidget {
                           width: 103,
                           height: 16,
                           child: Text(
-                            date,
+                            formattedDate,
                             style: TextStyle(
                               color: Colors.black.withOpacity(0.20000000298023224),
                               fontSize: 11,
@@ -137,7 +133,7 @@ class MatchingRecord extends StatelessWidget {
                           width: 80,
                           height: 80,
                           child: Text(
-                            image,
+                            '이미지',  // 여기서 이미지를 어떻게 처리할지에 대한 정보가 없어서 임시로 '이미지'라고 표시함
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.black,
@@ -157,7 +153,7 @@ class MatchingRecord extends StatelessWidget {
                           width: 110,
                           height: 20,
                           child: Text(
-                            restaurantName,
+                            category,
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 11,
@@ -176,7 +172,7 @@ class MatchingRecord extends StatelessWidget {
                           //width: 110,
                           height: 15,
                           child: Text(
-                            menuName,
+                            food,
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 9,
@@ -225,9 +221,9 @@ class MatchingRecord extends StatelessWidget {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ReviewPage(
-                                    restaurantName: restaurantName,
-                                    menuName: menuName,
-                                    orderDate: date,
+                                    restaurantName: category,
+                                    menuName: food,
+                                    orderDate: formattedDate,
                                   ),
                                 ),
                               );
@@ -265,16 +261,28 @@ class MatchingRecord extends StatelessWidget {
                         child: SizedBox(
                           width: 60,
                           height: 24,
-                          child: Text(
-                            '재주문',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 11,
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              height: 0,
-                              letterSpacing: -0.30,
+                          child: TextButton(
+                            onPressed: () {
+                              // "재주문" 버튼이 클릭되었을 때의 동작
+                              // 여기서는 Match_page.dart로 이동하도록 설정
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MatchingPage(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              '재주문',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 11,
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w400,
+                                height: 0,
+                                letterSpacing: -0.30,
+                              ),
                             ),
                           ),
                         ),
@@ -287,22 +295,16 @@ class MatchingRecord extends StatelessWidget {
                           height: 24,
                           child: TextButton(
                             onPressed: () {
-                              // 주문상세 버튼이 클릭되었을 때의 동작
+                              // "문의하기" 버튼이 클릭되었을 때의 동작
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => OrderDetailPage(
-                                    restaurantName: restaurantName,
-                                    menuName: menuName,
-                                    orderTime: date,
-                                    isRepresentative: false, // 대표결제자 여부
-                                    matchingMembers: 3, // 매칭된 인원 수
-                                  ),
+                                  builder: (context) => InquiryPage(), // InquiryPage로 이동
                                 ),
                               );
                             },
                             child: Text(
-                              '주문상세',
+                              '문의하기',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.black,

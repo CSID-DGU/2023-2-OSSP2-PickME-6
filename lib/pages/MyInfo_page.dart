@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'add_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ossp_pickme/pages/PointManage_page.dart';
 
 class MyInfoPage extends StatefulWidget {
   const MyInfoPage({Key? key}) : super(key: key);
@@ -169,7 +170,7 @@ class _MyInfoState extends State<MyInfoPage> {
                     ),
                   ),
                   Positioned(
-                    left: 180.57,
+                    left: 120.57,
                     top: 181.60,
                     child: Transform(
                       transform: Matrix4.identity()
@@ -190,7 +191,7 @@ class _MyInfoState extends State<MyInfoPage> {
                     ),
                   ),
                   Positioned(
-                    left: 69,
+                    left: 35,
                     top: 156,
                     child: InkWell(
                       onTap: () {
@@ -203,7 +204,7 @@ class _MyInfoState extends State<MyInfoPage> {
                         width: 71.77,
                         height: 25,
                         child: Text(
-                          '주문내역',
+                          '매칭기록',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 14,
@@ -217,7 +218,7 @@ class _MyInfoState extends State<MyInfoPage> {
                     ),
                   ),
                   Positioned(
-                    left: 234.54,
+                    left: 153.54,
                     top: 156.53,
                     child: InkWell(
                       onTap: () {
@@ -231,6 +232,54 @@ class _MyInfoState extends State<MyInfoPage> {
                         height: 25,
                         child: Text(
                           '리뷰관리',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            height: 0,
+                            letterSpacing: -0.30,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 235.57,
+                    top: 181.60,
+                    child: Transform(
+                      transform: Matrix4.identity()
+                        ..translate(0.0, 0.0)
+                        ..rotateZ(-1.57),
+                      child: Container(
+                        width: 28.74,
+                        decoration: ShapeDecoration(
+                          shape: RoundedRectangleBorder(
+                            side: BorderSide(
+                              width: 0.50,
+                              strokeAlign: BorderSide.strokeAlignCenter,
+                              color: Color(0xFFC4C4C4),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 260,
+                    top: 156,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => PointManagementPage()),
+                        );
+                      },
+                      child: SizedBox(
+                        width: 92.28,
+                        height: 25,
+                        child: Text(
+                          '포인트 관리',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 14,

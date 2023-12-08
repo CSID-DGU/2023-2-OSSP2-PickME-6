@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../pages/Match_page.dart';
 
 class ChineseFood extends StatefulWidget {
 const ChineseFood({Key? key}) : super(key: key);
@@ -7,6 +9,8 @@ const ChineseFood({Key? key}) : super(key: key);
   State<ChineseFood> createState() => _ChineseState();
 
 }
+
+List<String> chinafood = ['마라탕', '짜장면', '짬뽕', '탕수육', '기타중식'];
 
 class _ChineseState extends State<ChineseFood> {
   @override
@@ -19,80 +23,28 @@ class _ChineseState extends State<ChineseFood> {
         foregroundColor: Colors.black87,
         elevation: 1,
       ),
-      body: ListView(
-scrollDirection: Axis.vertical,
-children: <Widget>[
- ListTile(leading: Icon(Icons.food_bank),
- title: Text('마라탕'),
- trailing: Icon(Icons.navigate_next),
- onTap: () {
-   showDialog(
-  context: context,
-  builder: (BuildContext context) {
-    return MatchingDialog(
-                      
+      body: ListView.builder(
+scrollDirection: Axis.vertical, 
+itemCount: chinafood.length,
+itemBuilder: (BuildContext context, int index) { 
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.elliptical(20, 20)
+        )
+      ),
+      child: ListTile(
+        leading: Icon(Icons.food_bank),
+        title: Text(chinafood[index]),
+        trailing: Icon(Icons.navigate_next),
+        onTap: () {
+          
+        },
+      ),
     );
-    },
-  );
  },
- ),
- ListTile(leading: Icon(Icons.food_bank),
- title: Text('짜장면'),
- trailing: Icon(Icons.navigate_next),
- onTap: () {
-   showDialog(
-  context: context,
-  builder: (BuildContext context) {
-    return MatchingDialog(
-                      
-    );
-    },
-  );
- },
- ),
-  ListTile(leading: Icon(Icons.food_bank),
- title: Text('짬뽕'),
- trailing: Icon(Icons.navigate_next),
- onTap: () {
-   showDialog(
-  context: context,
-  builder: (BuildContext context) {
-    return MatchingDialog(
-                      
-    );
-    },
-  );
- },
- ),
-  ListTile(leading: Icon(Icons.food_bank),
- title: Text('탕수육'),
- trailing: Icon(Icons.navigate_next),
- onTap: () {
-   showDialog(
-  context: context,
-  builder: (BuildContext context) {
-    return MatchingDialog(
-                      
-    );
-    },
-  );
- },
- ),
-  ListTile(leading: Icon(Icons.food_bank),
- title: Text('기타 중식'),
- trailing: Icon(Icons.navigate_next),
- onTap: () {
-   showDialog(
-  context: context,
-  builder: (BuildContext context) {
-    return MatchingDialog(
-                      
-    );
-    },
-  );
- },
- ),
-],
+
       ),
     );
   }
@@ -114,6 +66,7 @@ class MatchingDialog extends StatelessWidget {
             ElevatedButton(
               onPressed: (){
                 //매칭 바로 선택되도록 이동하기 
+               
               }, 
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF2B4177), 
@@ -133,6 +86,8 @@ class MatchingDialog extends StatelessWidget {
 
 
 }
+
+ 
 
 
 

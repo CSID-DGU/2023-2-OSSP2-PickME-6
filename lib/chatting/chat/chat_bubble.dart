@@ -189,7 +189,7 @@ class ChatBubbles extends StatelessWidget {
                                       SizedBox(height: 10),
                                       Text('상세한 내용을 입력하세요'),
                                       Container(
-                                        height: 100, // 텍스트 박스 높이 조절
+                                        height: 100,
                                         padding: EdgeInsets.all(8),
                                         decoration: BoxDecoration(
                                           color: Colors.white,

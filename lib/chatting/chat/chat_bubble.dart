@@ -3,13 +3,15 @@ import 'package:flutter_chat_bubble/bubble_type.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_8.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 class ChatBubbles extends StatelessWidget {
-  ChatBubbles(this.message, this.isMe, this.userId, {Key? key}):super(key:key);
+  ChatBubbles(this.message, this.isMe, this.userId, this.documentId, {Key? key}):super(key:key);
 
   final String message;
   final bool isMe;
   final String userId;
-  List<String> reportReasons = ['욕설', '기타'];
+  final String documentId;
+  List<String> reportReasons = ['욕설', '잠수', '사기', '기타'];
 
   Future<String?> _getUserProfileImage(String userId) async {
     try {
@@ -232,11 +234,26 @@ class ChatBubbles extends StatelessWidget {
                                               ),
                                               TextButton(
                                                 onPressed: () async {
-                                                  await FirebaseFirestore.instance.collection('report').add({
-                                                    'reportedId' : ' ',
+                                                  Fluttertoast.showToast(
+                                                    msg: '신고가 접수되었습니다!',
+                                                    toastLength: Toast.LENGTH_SHORT,
+                                                    gravity: ToastGravity.BOTTOM,
+                                                    timeInSecForIosWeb: 1,
+                                                    backgroundColor: Colors.green,
+                                                    textColor: Colors.white,
+                                                    fontSize: 16.0,
+                                                  );
+                                                  var reportRef = await FirebaseFirestore.instance.collection('report').add({
+                                                    'reportedId' : userId,
                                                     'category' : selectedReason,
                                                     'reportcontent' : detailedReasonController.text,
                                                   });
+                                                  QuerySnapshot<Map<String, dynamic>> chatCapture =
+                                                  await FirebaseFirestore.instance.collection('chatRooms').doc(documentId).collection('chat').get();
+
+                                                  for (QueryDocumentSnapshot<Map<String, dynamic>> document in chatCapture.docs) {
+                                                    await FirebaseFirestore.instance.collection('report').doc(reportRef.id).collection('chatcontent').add(document.data()!);
+                                                  }
                                                   Navigator.of(context).pop();
                                                   Navigator.of(context).pop();
                                                 },

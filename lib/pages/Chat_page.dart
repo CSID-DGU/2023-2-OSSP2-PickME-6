@@ -77,12 +77,11 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
         int currentTime = DateTime.now().millisecondsSinceEpoch;
         double distanceInMeters = Geolocator.distanceBetween(userLocation.latitude, userLocation.longitude, data['latitude'], data['longitude']);
         int remainingTime = timerSetTime - (currentTime - timerStartTime) ~/ 1000; // 남은 시간 계산
-        if (remainingTime <= 0 || distanceInMeters > 1000) {
+        if(data['members'] == 0){
+          deleteChatRooms(doc.id);
           return null;
         }
-        else if(data['members'] == 0){
-          deleteChatRooms(doc.id);
-
+        if (remainingTime <= 0 || distanceInMeters > 1000) {
           return null;
         }
 

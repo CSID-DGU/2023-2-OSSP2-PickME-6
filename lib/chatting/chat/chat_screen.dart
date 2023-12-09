@@ -82,6 +82,17 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _deleteChatRoom(String documentId) async {
+
+    CollectionReference collectionReference = FirebaseFirestore.instance.collection('chatRooms').doc(documentId).collection('chat');
+    try {
+      QuerySnapshot querySnapshot = await collectionReference.get();
+      querySnapshot.docs.forEach((document) {
+        FirebaseFirestore.instance.collection('chatRooms').doc(documentId).collection('chat').doc(document.id).delete();
+      });
+    } catch (e) {
+      print("Error getting documents: $e");
+    }
+
     await FirebaseFirestore.instance.collection('chatRooms').doc(documentId).delete();
   }
 

@@ -101,6 +101,8 @@ class _LoginPageState extends State<LoginPage> {
                     } else if (role == 1) {
                       // 회원인 경우
                       _navigateToMemberScreen(context);
+                    }else{
+                      _showAccountStopDialog(context);
                     }
                   }
                 } catch (e) {
@@ -220,7 +222,26 @@ class _LoginPageState extends State<LoginPage> {
       },
     );
   }
-
+  void _showAccountStopDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('계정 정지'),
+          content: Text('신고에 의해 정지된 계정입니다.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // 팝업 닫기
+                Navigator.of(context).pop();
+              },
+              child: Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
+  }
   // 회원인 경우 로그인 성공
   void _navigateToMemberScreen(BuildContext context) {
     Navigator.push(

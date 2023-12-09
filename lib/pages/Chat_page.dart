@@ -96,7 +96,8 @@ class _ChatRoomListPageState extends State<ChatRoomListPage> {
           timerStartTime: timerStartTime,
           timerSetTime: timerSetTime,
         );
-      }).where((chatRoom) => chatRoom != null).cast<ChatRoom>().toList();
+      }).where((chatRoom) => chatRoom != null).cast<ChatRoom>().toList()
+        ..sort((a, b) => a.remainingTime.compareTo(b.remainingTime));
     });
   }
   Future<void> _showCreateChatRoomDialog() async {

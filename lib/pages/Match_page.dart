@@ -50,203 +50,81 @@ class _MatchingState extends State<MatchingPage> {
     remainingTime = defaultMatchingTime;
   }
 
-  void startMatching() async {
-    // 위치 정보 얻기
-    Position? userLocation = await getUserLocation();
-
-    // 매칭 버튼 누르면 타이머 돌아가게끔
-    setState(() {
-      isMatching = true;
-      matchingStartTime = DateTime.now(); // 매칭 시작 시간 저장
-    });
-
-    // 타이머 설정
-    timer = Timer.periodic(Duration(seconds: 1), (timer) async {
-      setState(() async {
-        remainingTime--;
-        if (remainingTime <= 0) {
-          // 매칭 시간 종료 후 타이머 중지 및 매칭 상태 초기화
-          timer.cancel();
-          isMatching = false;
-          // 사용자 정보 업데이트
-          await updateUserMatchingInfo();
-        }
-      });
-    });
-
-    // Firestore에 매칭 정보 및 위치 정보 저장
-    matchingDocument = await saveMatchingInfo(selectedCategory, selectedFood, userLocation);
-
-    // 매칭 시도
-    await tryMatch(userLocation);
-  }
-
-  Future<void> saveAcceptedUserIds(List<String> userIds) async {
-    try {
-      // Firestore에 동시에 수락한 사용자들의 UID를 저장하는 로직을 추가
-      await FirebaseFirestore.instance.collection('yourCollection').doc('yourDocument').update({
-        'acceptedUserIds': FieldValue.arrayUnion(userIds),
-      });
-    } catch (e) {
-      print('Error saving accepted user IDs: $e');
-      // 에러 처리
-    }
-  }
-
-  Future<void> setMakerId(String chatRoomId, String makerId) async {
-    try {
-      // 채팅방의 makerId 필드를 설정
-      await FirebaseFirestore.instance.collection('yourChatRoomsCollection').doc(chatRoomId).update({
-        'makerId': makerId,
-      });
-    } catch (e) {
-      print('Error setting maker ID: $e');
-      // 에러 처리
-    }
-  }
-
-  Future<DocumentReference> createChatRoomIfNotCreated(List<String> userIds) async {
-    try {
-      final chatRoomRef = await FirebaseFirestore.instance.collection('yourChatRoomsCollection').add({
-        'userIds': userIds,
-      });
-      return chatRoomRef;
-    } catch (e) {
-      print('Error creating chat room: $e');
-      // 에러 처리
-      rethrow;
-    }
-  }
-
-  Future<void> deleteMatchingInfo(String matchingInfoId) async {
-    try {
-      // 매칭 정보를 Firestore에서 삭제
-      await FirebaseFirestore.instance.collection('matchingInfo').doc(matchingInfoId).delete();
-    } catch (e) {
-      print('Error deleting matching info: $e');
-      // 에러 처리
-    }
-  }
-
-  Future<DocumentReference> getChatRoomRef(String matchingInfoId) async {
-    try {
-      final matchingInfoDoc = await FirebaseFirestore.instance.collection('matchingInfo').doc(matchingInfoId).get();
-      final chatRoomId = matchingInfoDoc['chatRoomId'];
-      return FirebaseFirestore.instance.collection('yourChatRoomsCollection').doc(chatRoomId);
-    } catch (e) {
-      print('Error getting chat room reference: $e');
-      // 에러 처리
-      rethrow;
-    }
-  }
-
-  Future<void> updateUserMatchingInfo() async {
-    // 사용자 정보 업데이트
-    final user = FirebaseAuth.instance.currentUser;
-    final matchingInfoRef = FirebaseFirestore.instance.collection('matchingInfo').doc(user!.uid);
-    await matchingInfoRef.update({'isMatching': false});
-  }
-
   Future<String?> getCurrentUserId() async {
     User? user = FirebaseAuth.instance.currentUser;
     return user?.uid;
   }
-    Future<void> tryMatch(Position? userLocation) async {
-      // 현재 사용자의 정보
-      final currentUserInfo = {
-        'selectedCategory': selectedCategory,
-        'selectedFood': selectedFood,
-        'userLocation': userLocation != null ? GeoPoint(
-            userLocation.latitude, userLocation.longitude) : null,
-        'userId': await getCurrentUserId(), // 현재 사용자의 UID 추가
-      };
 
-      // 매칭을 시도하고, 조건에 맞는 사용자
-      final matchingSnapshot = await FirebaseFirestore.instance
-          .collection('matchingInfo')
-          .where('selectedCategory', isEqualTo: selectedCategory)
-          .where('selectedFood', isEqualTo: selectedFood)
-          .where('isMatching', isEqualTo: true)
-          .get();
+  void startMatching() async {
+    // 위치 정보 얻기
+    Position? userLocation = await getUserLocation();
 
-      if (matchingSnapshot.docs.length >= 2) {
-        final currentUserUid = currentUserInfo['userId'];
-
-        final matchedUsers = <String>[]; // 매칭성공 사용자들의 UID를 저장할 리스트
-
-        for (final matchingDoc in matchingSnapshot.docs) {
-          final matchingData = matchingDoc.data() as Map<String, dynamic>;
-
-          if (currentUserUid != matchingData['userId']) {
-            final matchingUserLocation = matchingData['userLocation'] as GeoPoint?;
-
-            if (matchingUserLocation != null) {
-              final double distance = Geolocator.distanceBetween(
-                userLocation!.latitude,
-                userLocation.longitude,
-                matchingUserLocation.latitude,
-                matchingUserLocation.longitude,
-              );
-
-              if (distance <= 500) {
-                // 거리가 500m 이내이면 매칭 성공
-                matchedUsers.add(matchingData['userId']);
-              }
-            }
-          }
-        }
-
-        if (matchedUsers.length >= 1) {
-          // 매칭 성공한 유저들에게 팝업
-          bool shouldNavigateToChat = await showMatchSuccessPopup();
-
-          // 수락한 사용자들의 UID를 Firestore에 저장
-          await saveAcceptedUserIds(matchedUsers);
-
-          // 최소 사용자 수 이상이면 채팅방 생성
-          if (matchedUsers.length >= minimumRequiredUsers) {
-            final chatRoomRef = await createChatRoomIfNotCreated(matchedUsers);
-
-          }
-        } else {
-          // 매칭 실패
-          print('매칭 실패: 조건에 맞는 사용자가 없거나 거리가 500m 이내가 아님');
-        }
-      }
-    }
-  Future<DocumentReference> createChatRoom(Map<String, dynamic> user1, Map<String, dynamic> user2) async {
-    // 채팅방 생성
-    final chatRoomRef = await FirebaseFirestore.instance.collection('chatRooms').add({
-      'users': [user1['userId'], user2['userId']],
-      'timestamp': FieldValue.serverTimestamp(),
+    setState(() {
+      isMatching = true;
+      matchingStartTime = DateTime.now();
     });
 
-    // 매칭 성공 시 팝업 표시
-    bool shouldNavigateToChat = await showMatchSuccessPopup();
+    // tryMatch를 호출하여 매칭 시도 (userLocation을 전달)
+    await tryMatch(userLocation);
 
-    print('채팅방 생성 완료: ${chatRoomRef.id}');
+    // 타이머 설정
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        remainingTime--;
+        if (remainingTime <= 0) {
+          timer.cancel();
+          isMatching = false;
+        }
+      });
+    });
+  // 이제 tryMatch를 호출하여 매칭 시도
+    await tryMatch(userLocation);
+  }
 
-    // 팝업에서 수락한 경우에만 채팅방으로 이동
-    if (shouldNavigateToChat) {
-      // 현재 화면 종료하고 ChatScreen으로 이동
-      Navigator.of(context).pop();
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ChatScreen(documentId: chatRoomRef.id),
-        ),
-      );
+  Future<void> tryMatch(Position? userLocation) async {
+    final currentUserUid = await getCurrentUserId();
+    final currentUserInfo = {
+      'selectedCategory': selectedCategory,
+      'selectedFood': selectedFood,
+      'userLocation': userLocation != null ? GeoPoint(userLocation.latitude, userLocation.longitude) : null,
+      'userId': currentUserUid,
+      'accept': 0, // 초기값은 0
+    };
+
+    // 1. 파이어베이스 탐색
+    final matchingCollection = FirebaseFirestore.instance.collection('wait_Matching');
+    final query = matchingCollection
+        .where('selectedCategory', isEqualTo: selectedCategory)
+        .where('selectedFood', isEqualTo: selectedFood)
+        .where('accept', isEqualTo: 0);
+
+    final matchingSnapshot = await query.get();
+
+    if (matchingSnapshot.docs.isNotEmpty) {
+      // 1-1. 조건을 충족하는 문서가 있다면
+      final matchingDoc = matchingSnapshot.docs.first;
+      final matchingDocId = matchingDoc.id;
+
+      await matchingCollection.doc(matchingDocId).update({
+        'user1': currentUserInfo, // 현재 사용자 정보 저장
+      });
+
+      // 2. 여기서 사용자가 2명 이상인 경우 다이얼로그를 띄워준다.
+      if (matchingDoc['user1'] != null && matchingDoc['user2'] != null) {
+        await showMatchSuccessDialog(matchingDoc);
+      }
     } else {
-      // 사용자가 거절한 경우 매칭 페이지로 이동
-      Navigator.of(context).pop();
+      // 1-2. 조건을 충족하는 문서가 없다면 새로운 문서를 생성
+      await matchingCollection.add({
+        'user1': currentUserInfo,
+      });
     }
-    return chatRoomRef;
   }
 
 
-  Future<bool> showMatchSuccessPopup() async {
-    // 매칭 성공 시 팝업 표시
-    return await showDialog(
+  Future<void> showMatchSuccessDialog(DocumentSnapshot matchingDoc) async {
+    // 2. 다이얼로그 표시 및 채팅방 생성
+    bool shouldNavigateToChat = await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -269,7 +147,40 @@ class _MatchingState extends State<MatchingPage> {
         );
       },
     );
+
+    if (shouldNavigateToChat) {
+      // 2-1. 채팅방으로 이동
+      await navigateToChat(matchingDoc);
+    } else {
+      // 2-2. 거절한 경우 wait_Matching 문서에서 현재 사용자 정보 삭제
+      final currentUserUid = await getCurrentUserId();
+      await matchingDoc.reference.update({
+        if (matchingDoc['user1']['userId'] == currentUserUid) 'user1': null,
+        if (matchingDoc['user2']['userId'] == currentUserUid) 'user2': null,
+      });
+    }
   }
+
+  Future<void> navigateToChat(DocumentSnapshot matchingDoc) async {
+    // 2-1. 채팅방 생성
+    final user1 = matchingDoc['user1'];
+    final user2 = matchingDoc['user2'];
+
+    final chatRoomRef = await createChatRoom(user1, user2);
+
+    // 3. 해당 문서의 사용자가 수락을 눌렀을 경우 accept 필드값을 1로 업데이트
+    final currentUserUid = await getCurrentUserId();
+    if (user1 != null && user2 != null) {
+      if (user1['userId'] == currentUserUid) {
+        // user1이 현재 사용자인 경우
+        await matchingDoc.reference.update({'user1.accept': 1});
+      } else if (user2['userId'] == currentUserUid) {
+        // user2가 현재 사용자인 경우
+        await matchingDoc.reference.update({'user2.accept': 1});
+      }
+    }
+  }
+
 
   Future<Position?> getUserLocation() async {
     // 위치 권한 요청
@@ -283,31 +194,50 @@ class _MatchingState extends State<MatchingPage> {
     // 현재 위치 정보 얻기
     return await Geolocator.getCurrentPosition();
   }
-
-  Future<DocumentReference> saveMatchingInfo(String selectedCategory, String selectedFood, Position? userLocation) async {
-    // Firestore 컬렉션에 "matchingInfo"라는 이름으로 저장
-    CollectionReference matchingCollection = FirebaseFirestore.instance.collection('matchingInfo');
-
-    // 매칭 정보 및 위치 정보를 Map으로 만들어서 Firestore에 저장하고 DocumentReference 반환
-    return await matchingCollection.add({
-      'selectedCategory': selectedCategory,
-      'selectedFood': selectedFood,
-      'timestamp': FieldValue.serverTimestamp(),
-      'isMatching': true,
-      'userLocation': userLocation != null ? GeoPoint(userLocation.latitude, userLocation.longitude) : null,
+  Future<DocumentReference> createChatRoom(Map<String, dynamic> user1, Map<String, dynamic> user2) async {
+    // 채팅방 생성
+    final chatRoomRef = await FirebaseFirestore.instance.collection('chatRooms').add({
+      'users': [user1['userId'], user2['userId']],
+      'created_at': FieldValue.serverTimestamp(),
     });
+
+    // 사용자 정보에 채팅방 ID 추가
+    await FirebaseFirestore.instance.collection('users').doc(user1['userId']).update({
+      'chatRoomIds': FieldValue.arrayUnion([chatRoomRef.id]),
+    });
+
+    await FirebaseFirestore.instance.collection('users').doc(user2['userId']).update({
+      'chatRoomIds': FieldValue.arrayUnion([chatRoomRef.id]),
+    });
+
+    return chatRoomRef;
   }
 
-  void cancelMatching() async {
-    // 매칭 정보가 저장되었는지 확인
-    if (matchingDocument != null) {
+  void cancelMatching() {
+    cancelMatchingAsync();
+  }
+
+  Future<void> cancelMatchingAsync() async {
+    // 비동기 작업 수행
+    final currentUserUid = await getCurrentUserId();
+    final matchingCollection = FirebaseFirestore.instance.collection('wait_Matching');
+    final query = matchingCollection
+        .where('user1.userId', isEqualTo: currentUserUid)
+        .where('accept', isEqualTo: 0);
+
+    final matchingSnapshot = await query.get();
+
+    if (matchingSnapshot.docs.isNotEmpty) {
       // Firestore에서 해당 문서 삭제
-      await matchingDocument!.delete();
+      final matchingDoc = matchingSnapshot.docs.first;
+      await matchingDoc.reference.delete();
     }
 
     // 팝업 닫기, 타이머 중지, 매칭 상태 초기화
     Navigator.of(context).pop();
     timer.cancel();
+
+    // 비동기 작업 완료 후 setState 호출
     setState(() {
       isMatching = false;
       matchingStartTime = null;

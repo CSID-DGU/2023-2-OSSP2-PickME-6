@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import '../chatting/chat/chat_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+
 class MatchingPage extends StatefulWidget {
   const MatchingPage({Key? key}) : super(key: key);
 
@@ -21,7 +22,7 @@ class _MatchingState extends State<MatchingPage> {
 
   bool isMatching = false;
   late int remainingTime;
-  late Timer timer;
+  Timer? timer;
   late DocumentReference? matchingDocument;
 
   DateTime? matchingStartTime;
@@ -64,9 +65,6 @@ class _MatchingState extends State<MatchingPage> {
       matchingStartTime = DateTime.now();
     });
 
-    // tryMatch를 호출하여 매칭 시도 (userLocation을 전달)
-    await tryMatch(userLocation);
-
     // 타이머 설정
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
@@ -76,10 +74,15 @@ class _MatchingState extends State<MatchingPage> {
           isMatching = false;
         }
       });
-    });
-  // 이제 tryMatch를 호출하여 매칭 시도
+      // 남은 시간이 0이 되면 매칭 취소 및 알림
+      if (remainingTime == 0) {
+        cancelMatchingAsync();
+    }});
+    // 이제 tryMatch를 호출하여 매칭 시도
     await tryMatch(userLocation);
   }
+
+  ///*********************************************************************************************************
 
   Future<void> tryMatch(Position? userLocation) async {
     final currentUserUid = await getCurrentUserId();
@@ -94,94 +97,164 @@ class _MatchingState extends State<MatchingPage> {
     // 1. 파이어베이스 탐색
     final matchingCollection = FirebaseFirestore.instance.collection('wait_Matching');
     final query = matchingCollection
-        .where('selectedCategory', isEqualTo: selectedCategory)
-        .where('selectedFood', isEqualTo: selectedFood)
-        .where('accept', isEqualTo: 0);
+        .where('user1.selectedCategory', isEqualTo: selectedCategory)
+        .where('user1.selectedFood', isEqualTo: selectedFood);
 
     final matchingSnapshot = await query.get();
+
+    // 확인차 넣은 print문
+    print('조건: $selectedCategory, $selectedFood');
+    print('일치하는 문서 수: ${matchingSnapshot.docs.length}');
+
+    ///************************************************************************************************
 
     if (matchingSnapshot.docs.isNotEmpty) {
       // 1-1. 조건을 충족하는 문서가 있다면
       final matchingDoc = matchingSnapshot.docs.first;
       final matchingDocId = matchingDoc.id;
-
-      await matchingCollection.doc(matchingDocId).update({
-        'user1': currentUserInfo, // 현재 사용자 정보 저장
-      });
-
-      // 2. 여기서 사용자가 2명 이상인 경우 다이얼로그를 띄워준다.
-      if (matchingDoc['user1'] != null && matchingDoc['user2'] != null) {
-        await showMatchSuccessDialog(matchingDoc);
+      try {
+        // 1-2. 유저2에 내 정보 저장
+        await matchingCollection.doc(matchingDocId).update({
+          'user2': currentUserInfo,
+        });
+      } catch (e) {
+        // 이미 다른 사용자가 업데이트했을 경우 실패할 수 있음
+        print('업데이트 실패, 새로운 문서 추가');
+        await matchingCollection.add({
+          'user1': currentUserInfo,
+          'user2': {
+            'selectedCategory': '',
+            'selectedFood': '',
+            'userLocation': '',
+            'userId': '',
+            'accept': 0,
+          },
+        });
       }
+      handleMatchCompletion(matchingDocId, context);
     } else {
-      // 1-2. 조건을 충족하는 문서가 없다면 새로운 문서를 생성
-      await matchingCollection.add({
+      // 1-5. 조건을 충족하는 문서가 없다면 새로운 문서를 생성
+      final newDocRef = await matchingCollection.add({
         'user1': currentUserInfo,
+        'user2': {
+          'selectedCategory': '',
+          'selectedFood': '',
+          'userLocation': '',
+          'userId': '',
+          'accept': 0,
+        },
       });
+      final matchingDocId = newDocRef.id;
+      handleMatchCompletion(matchingDocId, context);
     }
   }
 
 
-  Future<void> showMatchSuccessDialog(DocumentSnapshot matchingDoc) async {
-    // 2. 다이얼로그 표시 및 채팅방 생성
-    bool shouldNavigateToChat = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('매칭 성공!'),
-          content: Text('채팅방에 입장하시겠습니까?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false); // 거절
+
+///***************************************************************************
+  void handleMatchCompletion(String matchingDocId, BuildContext context) {
+    // 아래의 예시는 Timer를 사용하여 1초마다 Firebase 문서를 확인하고, user2.userId가 null이 아니면 다이얼로그를 띄우는 것입니다.
+
+    Timer.periodic(Duration(seconds: 1), (timer) async {
+      try {
+        // 매 초마다 Firebase 문서를 확인
+        DocumentSnapshot<Map<String, dynamic>> matchingDoc =
+        await FirebaseFirestore.instance.collection('wait_Matching').doc(matchingDocId).get();
+
+        // user2.userId 필드값이 null이 아니면 다이얼로그 띄우기
+        if (matchingDoc.exists && matchingDoc['user2'] != null && matchingDoc['user2']['userId'] != '') {
+
+          ///*******오류 확인용*********
+
+          print('다이얼로그 띄울거임');
+          // 채팅방
+          // final user1Id = matchingDoc['user1']['userId'];
+          // final user2Id = matchingDoc['user2']['userId'];
+          // final makerId = user1Id;
+
+          String chatRoomId = await createChatRoom(
+            matchingDoc['user1']['userId'],
+            matchingDoc['user2']['userId'],
+            matchingDoc['user1']['userId'], // 예시로 makerId에 user1의 ID를 사용
+          );
+
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('매칭 성공!'),
+                content: Text('채팅방에 입장하시겠습니까?'),
+                actions: [
+                  TextButton(
+                    onPressed: () async { //수락 눌렀을 때
+                Navigator.of(context).pop(true);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatScreen(documentId: chatRoomId),
+                  ),
+                );
               },
-              child: Text('거절'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true); // 수락
-              },
-              child: Text('수락'),
-            ),
-          ],
-        );
-      },
-    );
+                    child: Text('수락'),
+                  ),
+                  TextButton(
+                    onPressed: () { //거절 눌렀을 때
+                      Navigator.of(context).pop(false);
+                    },
+                    child: Text('거절'),
+                  ),
+                ],
+              );
+            },
+          );
 
-    if (shouldNavigateToChat) {
-      // 2-1. 채팅방으로 이동
-      await navigateToChat(matchingDoc);
-    } else {
-      // 2-2. 거절한 경우 wait_Matching 문서에서 현재 사용자 정보 삭제
-      final currentUserUid = await getCurrentUserId();
-      await matchingDoc.reference.update({
-        if (matchingDoc['user1']['userId'] == currentUserUid) 'user1': null,
-        if (matchingDoc['user2']['userId'] == currentUserUid) 'user2': null,
-      });
-    }
-  }
-
-  Future<void> navigateToChat(DocumentSnapshot matchingDoc) async {
-    // 2-1. 채팅방 생성
-    final user1 = matchingDoc['user1'];
-    final user2 = matchingDoc['user2'];
-
-    final chatRoomRef = await createChatRoom(user1, user2);
-
-    // 3. 해당 문서의 사용자가 수락을 눌렀을 경우 accept 필드값을 1로 업데이트
-    final currentUserUid = await getCurrentUserId();
-    if (user1 != null && user2 != null) {
-      if (user1['userId'] == currentUserUid) {
-        // user1이 현재 사용자인 경우
-        await matchingDoc.reference.update({'user1.accept': 1});
-      } else if (user2['userId'] == currentUserUid) {
-        // user2가 현재 사용자인 경우
-        await matchingDoc.reference.update({'user2.accept': 1});
+          // 타이머 중지
+          timer.cancel();
+        }
+        else{
+          print('매치 실패');
+        }
+      } catch (e) {
+        print('에러 발생: $e');
       }
+    });
+  }
+///***********************************************************************
+  Future<String> createChatRoom(String user1Id, String user2Id, String makerId) async {
+    try {
+      // 사용자 ID를 정렬하여 고유한 채팅방 ID 생성
+      List<String> userIds = [user1Id, user2Id];
+      userIds.sort();
+      String chatRoomId = userIds.join('_');
+
+      // chatRooms 컬렉션에서 채팅방 ID가 이미 존재하는지 확인
+      DocumentSnapshot<Map<String, dynamic>> existingChatRoom =
+      await FirebaseFirestore.instance.collection('chatRooms')
+          .doc(chatRoomId)
+          .get();
+
+      if (existingChatRoom.exists) {
+        // 이미 생성된 채팅방이 있는 경우 해당 채팅방의 ID를 반환
+        return chatRoomId;
+      }
+
+      // 채팅방 생성
+      DocumentReference newChatRoomRef = await FirebaseFirestore.instance
+          .collection('chatRooms').doc(chatRoomId);
+      await newChatRoomRef.set({
+        'users': [user1Id, user2Id],
+        'makerId': makerId,
+        // 여기에 다른 필요한 필드 추가 가능
+      });
+
+      return chatRoomId;
+    } catch (e) {
+      print('채팅방 생성 중 오류 발생: $e');
+      return '';
     }
   }
 
-
+  /// ******************************************************************
   Future<Position?> getUserLocation() async {
     // 위치 권한 요청
     LocationPermission permission = await Geolocator.requestPermission();
@@ -193,24 +266,6 @@ class _MatchingState extends State<MatchingPage> {
 
     // 현재 위치 정보 얻기
     return await Geolocator.getCurrentPosition();
-  }
-  Future<DocumentReference> createChatRoom(Map<String, dynamic> user1, Map<String, dynamic> user2) async {
-    // 채팅방 생성
-    final chatRoomRef = await FirebaseFirestore.instance.collection('chatRooms').add({
-      'users': [user1['userId'], user2['userId']],
-      'created_at': FieldValue.serverTimestamp(),
-    });
-
-    // 사용자 정보에 채팅방 ID 추가
-    await FirebaseFirestore.instance.collection('users').doc(user1['userId']).update({
-      'chatRoomIds': FieldValue.arrayUnion([chatRoomRef.id]),
-    });
-
-    await FirebaseFirestore.instance.collection('users').doc(user2['userId']).update({
-      'chatRoomIds': FieldValue.arrayUnion([chatRoomRef.id]),
-    });
-
-    return chatRoomRef;
   }
 
   void cancelMatching() {
@@ -235,7 +290,7 @@ class _MatchingState extends State<MatchingPage> {
 
     // 팝업 닫기, 타이머 중지, 매칭 상태 초기화
     Navigator.of(context).pop();
-    timer.cancel();
+    timer?.cancel();
 
     // 비동기 작업 완료 후 setState 호출
     setState(() {
@@ -247,9 +302,13 @@ class _MatchingState extends State<MatchingPage> {
 
   @override
   void dispose() {
-    timer.cancel();
+    // 타이머가 null이 아닌 경우에만 취소
+    if (timer != null && timer!.isActive) {
+      timer!.cancel();
+    }
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {

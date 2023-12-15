@@ -170,7 +170,7 @@ class _MyInfoState extends State<MyInfoPage> {
                     ),
                   ),
                   Positioned(
-                    left: 120.57,
+                    left: 180.57,
                     top: 181.60,
                     child: Transform(
                       transform: Matrix4.identity()
@@ -191,7 +191,7 @@ class _MyInfoState extends State<MyInfoPage> {
                     ),
                   ),
                   Positioned(
-                    left: 35,
+                    left: 65,
                     top: 156,
                     child: InkWell(
                       onTap: () {
@@ -218,55 +218,7 @@ class _MyInfoState extends State<MyInfoPage> {
                     ),
                   ),
                   Positioned(
-                    left: 153.54,
-                    top: 156.53,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => ReviewManagementPage()),
-                        );
-                      },
-                      child: SizedBox(
-                        width: 92.28,
-                        height: 25,
-                        child: Text(
-                          '리뷰관리',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            height: 0,
-                            letterSpacing: -0.30,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 235.57,
-                    top: 181.60,
-                    child: Transform(
-                      transform: Matrix4.identity()
-                        ..translate(0.0, 0.0)
-                        ..rotateZ(-1.57),
-                      child: Container(
-                        width: 28.74,
-                        decoration: ShapeDecoration(
-                          shape: RoundedRectangleBorder(
-                            side: BorderSide(
-                              width: 0.50,
-                              strokeAlign: BorderSide.strokeAlignCenter,
-                              color: Color(0xFFC4C4C4),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 260,
+                    left: 235,
                     top: 156,
                     child: InkWell(
                       onTap: () {
@@ -465,7 +417,6 @@ class _MyInfoState extends State<MyInfoPage> {
             TextButton(
               onPressed: () {
                 // 확인 버튼
-
                 User? user = _authentication.currentUser;
                 _firestore.collection("user").doc(user!.uid).delete().then(
                       (doc) => print("Document deleted"),

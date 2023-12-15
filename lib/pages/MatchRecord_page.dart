@@ -25,7 +25,7 @@ class MatchRecord extends StatelessWidget {
       ),
       body: FutureBuilder<QuerySnapshot>(
         // Firestore에서 데이터 가져오기
-        future: FirebaseFirestore.instance.collection('matchingInfo').get(),
+        future: FirebaseFirestore.instance.collection('wait_Matching').get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return CircularProgressIndicator(); // 데이터 로딩 중일 때 표시할 UI
@@ -82,8 +82,8 @@ class MatchingRecord extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String category = matchingInfo['category'] ?? '';
-    String food = matchingInfo['food'] ?? '';
+    String category = matchingInfo['user1']['selectedCategory'] ?? '';
+    String food = matchingInfo['user1']['selectedFood'] ?? '';
     Timestamp timestamp = matchingInfo['timestamp'] ?? Timestamp.now();
 
     // Timestamp를 DateTime으로 변환
@@ -99,7 +99,7 @@ class MatchingRecord extends StatelessWidget {
             children: [
               Positioned(
                 child: Container(
-                  height: 130,
+                  height: 140,  // 재주문, 문의하기 버튼 크기 조절
                   clipBehavior: Clip.antiAlias,
                   decoration: ShapeDecoration(
                     color: Colors.white,
@@ -117,10 +117,48 @@ class MatchingRecord extends StatelessWidget {
                             formattedDate,
                             style: TextStyle(
                               color: Colors.black.withOpacity(0.20000000298023224),
-                              fontSize: 11,
+                              fontSize: 13,
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w400,
-                              height: 0,
+                              height: 1.0,  // 텍스트 높이를 조정하여 중앙에 맞춤
+                              letterSpacing: -0.30,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 8,
+                        top: 39,
+                        child: SizedBox(
+                          width: 230,
+                          height: 20,
+                          child: Text(
+                            '카테고리: $category',  // 카테고리 출력 방식 변경
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              height: 1.0,  // 텍스트 높이를 조정하여 중앙에 맞춤
+                              letterSpacing: -0.30,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 8,
+                        top: 63,
+                        child: SizedBox(
+                          //width: 110,
+                          height: 15,
+                          child: Text(
+                            '음식: $food',  // 음식 출력 방식 변경
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 12,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              height: 1.0,  // 텍스트 높이를 조정하여 중앙에 맞춤
                               letterSpacing: -0.30,
                             ),
                           ),
@@ -128,68 +166,10 @@ class MatchingRecord extends StatelessWidget {
                       ),
                       Positioned(
                         left: 10,
-                        top: 37,
-                        child: SizedBox(
-                          width: 80,
-                          height: 80,
-                          child: Text(
-                            '이미지',  // 여기서 이미지를 어떻게 처리할지에 대한 정보가 없어서 임시로 '이미지'라고 표시함
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 12,
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              height: 0,
-                              letterSpacing: -0.30,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 108,
-                        top: 39,
-                        child: SizedBox(
-                          width: 110,
-                          height: 20,
-                          child: Text(
-                            category,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 11,
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              height: 0,
-                              letterSpacing: -0.30,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 108,
-                        top: 63,
-                        child: SizedBox(
-                          //width: 110,
-                          height: 15,
-                          child: Text(
-                            food,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 9,
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              height: 0,
-                              letterSpacing: -0.30,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 108,
-                        top: 89,
+                        top: 101,
                         child: Container(
-                          width: 70,
-                          height: 27,
+                          width: 230,
+                          height: 34,  // 재주문 버튼 크기 조절
                           decoration: ShapeDecoration(
                             color: Color(0xFFFCFCFC),
                             shape: RoundedRectangleBorder(side: BorderSide(width: 1)),
@@ -197,11 +177,11 @@ class MatchingRecord extends StatelessWidget {
                         ),
                       ),
                       Positioned(
-                        left: 189,
-                        top: 89,
+                        right: 10,
+                        top: 101,
                         child: Container(
-                          width: 70,
-                          height: 27,
+                          width: 230,
+                          height: 34,  // 문의하기 버튼 크기 조절
                           decoration: ShapeDecoration(
                             color: Color(0xFFFCFCFC),
                             shape: RoundedRectangleBorder(side: BorderSide(width: 1)),
@@ -209,58 +189,11 @@ class MatchingRecord extends StatelessWidget {
                         ),
                       ),
                       Positioned(
-                        left: 194,
-                        top: 91,
+                        left: 95,
+                        top: 106,
                         child: SizedBox(
                           width: 60,
-                          height: 24,
-                          child: TextButton(
-                            onPressed: () {
-                              // 리뷰쓰기 버튼이 클릭되었을 때의 동작
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ReviewPage(
-                                    restaurantName: category,
-                                    menuName: food,
-                                    orderDate: formattedDate,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              '리뷰쓰기',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 11,
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w400,
-                                height: 0,
-                                letterSpacing: -0.30,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 270,
-                        top: 89,
-                        child: Container(
-                          width: 70,
-                          height: 27,
-                          decoration: ShapeDecoration(
-                            color: Color(0xFFFCFCFC),
-                            shape: RoundedRectangleBorder(side: BorderSide(width: 1)),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 113,
-                        top: 91,
-                        child: SizedBox(
-                          width: 60,
-                          height: 24,
+                          height: 30,  // 재주문 버튼 크기 조절
                           child: TextButton(
                             onPressed: () {
                               // "재주문" 버튼이 클릭되었을 때의 동작
@@ -277,10 +210,10 @@ class MatchingRecord extends StatelessWidget {
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.black,
-                                fontSize: 11,
+                                fontSize: 14,
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w400,
-                                height: 0,
+                                height: 1.0,  // 텍스트 높이를 조정하여 중앙에 맞춤
                                 letterSpacing: -0.30,
                               ),
                             ),
@@ -288,11 +221,11 @@ class MatchingRecord extends StatelessWidget {
                         ),
                       ),
                       Positioned(
-                        left: 275,
-                        top: 91,
+                        right: 87,
+                        top: 106,
                         child: SizedBox(
-                          width: 60,
-                          height: 24,
+                          width: 80,
+                          height: 30,  // 문의하기 버튼 크기 조절
                           child: TextButton(
                             onPressed: () {
                               // "문의하기" 버튼이 클릭되었을 때의 동작
@@ -308,10 +241,10 @@ class MatchingRecord extends StatelessWidget {
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.black,
-                                fontSize: 11,
+                                fontSize: 14,
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w400,
-                                height: 0,
+                                height: 1.0,  // 텍스트 높이를 조정하여 중앙에 맞춤
                                 letterSpacing: -0.30,
                               ),
                             ),

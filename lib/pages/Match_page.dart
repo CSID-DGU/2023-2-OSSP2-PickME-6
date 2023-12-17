@@ -171,9 +171,8 @@ class _MatchingState extends State<MatchingPage> {
 
         // user2.userId 필드값이 null이 아니면 다이얼로그 띄우기
         if (matchingDoc.exists && matchingDoc['user2'] != null && matchingDoc['user2']['userId'] != '') {
-
+          Navigator.of(context).pop();
           ///*******오류 확인용*********
-
           print('다이얼로그 띄울거임');
           // 채팅방
           // final user1Id = matchingDoc['user1']['userId'];
@@ -207,6 +206,7 @@ class _MatchingState extends State<MatchingPage> {
                   ),
                   TextButton(
                     onPressed: () { //거절 눌렀을 때
+                      cancelMatchingAsync();
                       Navigator.of(context).pop(false);
                     },
                     child: Text('거절'),
@@ -276,9 +276,12 @@ class _MatchingState extends State<MatchingPage> {
     return await Geolocator.getCurrentPosition();
   }
 
+///************************************************************************
+
   void cancelMatching() {
     cancelMatchingAsync();
   }
+
 
   Future<void> cancelMatchingAsync() async {
     // 비동기 작업 수행
@@ -307,6 +310,7 @@ class _MatchingState extends State<MatchingPage> {
       remainingTime = defaultMatchingTime; // 매칭 취소 시 기본값으로 초기화
     });
   }
+
 
   @override
   void dispose() {

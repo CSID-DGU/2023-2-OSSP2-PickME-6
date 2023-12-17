@@ -74,7 +74,10 @@ class _PointManagementPageState extends State<PointManagementPage> {
           Expanded(
             child: FutureBuilder<QuerySnapshot>(
               // Firestore에서 포인트 변동 내역 가져오기
-              future: FirebaseFirestore.instance.collection('point').get(),
+              future: FirebaseFirestore.instance
+                  .collection('point')
+                  .orderBy('timestamp', descending: true)  // timestamp 기준으로 내림차순 정렬
+                  .get(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return CircularProgressIndicator();

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:ossp_pickme/pages/OrderDetail_page.dart';
-import 'package:ossp_pickme/pages/Review_page.dart';
 import 'package:ossp_pickme/pages/Match_page.dart';
 import 'package:ossp_pickme/pages/Inquiry_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MatchRecord extends StatelessWidget {
-  const MatchRecord({super.key});
+  const MatchRecord({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +23,7 @@ class MatchRecord extends StatelessWidget {
       ),
       body: FutureBuilder<QuerySnapshot>(
         // Firestore에서 데이터 가져오기
-        future: FirebaseFirestore.instance.collection('wait_Matching').get(),
+        future: FirebaseFirestore.instance.collection('matchingInfo').get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return CircularProgressIndicator(); // 데이터 로딩 중일 때 표시할 UI
@@ -169,7 +167,7 @@ class MatchingRecord extends StatelessWidget {
                         left: 10,
                         top: 101,
                         child: Container(
-                          width: 230,
+                          width: 150,
                           height: 34,  // 재주문 버튼 크기 조절
                           decoration: ShapeDecoration(
                             color: Color(0xFFFCFCFC),
@@ -181,7 +179,7 @@ class MatchingRecord extends StatelessWidget {
                         right: 10,
                         top: 101,
                         child: Container(
-                          width: 230,
+                          width: 150,
                           height: 34,  // 문의하기 버튼 크기 조절
                           decoration: ShapeDecoration(
                             color: Color(0xFFFCFCFC),
@@ -190,7 +188,7 @@ class MatchingRecord extends StatelessWidget {
                         ),
                       ),
                       Positioned(
-                        left: 95,
+                        left: 55,
                         top: 106,
                         child: SizedBox(
                           width: 60,
@@ -226,7 +224,7 @@ class MatchingRecord extends StatelessWidget {
                         ),
                       ),
                       Positioned(
-                        right: 87,
+                        right: 45,
                         top: 106,
                         child: SizedBox(
                           width: 80,

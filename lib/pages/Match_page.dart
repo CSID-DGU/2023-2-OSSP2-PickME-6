@@ -7,7 +7,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 
 class MatchingPage extends StatefulWidget {
-  const MatchingPage({Key? key}) : super(key: key);
+  final String? initialCategory;
+  final String? initialFood;
+
+  const MatchingPage({Key? key, this.initialCategory, this.initialFood}) : super(key: key);
 
   @override
   State<MatchingPage> createState() => _MatchingState();
@@ -36,7 +39,7 @@ class _MatchingState extends State<MatchingPage> {
   @override
   void initState() {
     super.initState();
-    selectedCategory = '한식';
+    selectedCategory = widget.initialCategory ?? '한식';
     categoryToFoodMap = {
       '한식': ['족발보쌈', '김치찌개', '된장찌개', '부대찌개', '국밥', '설렁탕', '감자탕', '곱도리탕', '찜닭', '불고기', '비빔밥', '아구찜', '해물찜', '낙곱새', '냉면', '칼국수', '수제비', '기타한식'],
       '중식': ['짜장면', '짬뽕', '탕수육', '마라탕', '마라상궈', '기타중식'],
@@ -47,7 +50,7 @@ class _MatchingState extends State<MatchingPage> {
     };
     categories = categoryToFoodMap.keys.toList();
     foods = categoryToFoodMap[selectedCategory] ?? [];
-    selectedFood = foods.isNotEmpty ? foods.first : '';
+    selectedFood = widget.initialFood ?? (foods.isNotEmpty ? foods.first : '');
     remainingTime = defaultMatchingTime;
   }
 
@@ -77,7 +80,7 @@ class _MatchingState extends State<MatchingPage> {
       // 남은 시간이 0이 되면 매칭 취소 및 알림
       if (remainingTime == 0) {
         cancelMatchingAsync();
-    }});
+      }});
     // 이제 tryMatch를 호출하여 매칭 시도
     await tryMatch(userLocation);
   }
@@ -151,7 +154,7 @@ class _MatchingState extends State<MatchingPage> {
 
 
 
-///***************************************************************************
+  ///***************************************************************************
   void handleMatchCompletion(String matchingDocId, BuildContext context) {
     // 아래의 예시는 Timer를 사용하여 1초마다 Firebase 문서를 확인하고, user2.userId가 null이 아니면 다이얼로그를 띄우는 것입니다.
 
@@ -187,14 +190,14 @@ class _MatchingState extends State<MatchingPage> {
                 actions: [
                   TextButton(
                     onPressed: () async { //수락 눌렀을 때
-                Navigator.of(context).pop(true);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatScreen(documentId: chatRoomId),
-                  ),
-                );
-              },
+                      Navigator.of(context).pop(true);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatScreen(documentId: chatRoomId),
+                        ),
+                      );
+                    },
                     child: Text('수락'),
                   ),
                   TextButton(
@@ -219,7 +222,7 @@ class _MatchingState extends State<MatchingPage> {
       }
     });
   }
-///***********************************************************************
+  ///***********************************************************************
   Future<String> createChatRoom(String user1Id, String user2Id, String makerId) async {
     try {
       // 사용자 ID를 정렬하여 고유한 채팅방 ID 생성

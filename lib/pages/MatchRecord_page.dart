@@ -116,7 +116,8 @@ class MatchingRecord extends StatelessWidget {
                           child: Text(
                             formattedDate,
                             style: TextStyle(
-                              color: Colors.black.withOpacity(0.20000000298023224),
+                              //color: Color(0xFF424242),
+                              color: Colors.black.withOpacity(0.5),
                               fontSize: 13,
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w400,
@@ -201,7 +202,11 @@ class MatchingRecord extends StatelessWidget {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => MatchingPage(),
+                                  builder: (context) => MatchingPage(
+                                    // 주문내역 정보를 초기 선택값으로 전달
+                                    initialCategory: category,
+                                    initialFood: food,
+                                  ),
                                 ),
                               );
                             },

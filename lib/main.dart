@@ -1,6 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_state_notifier/flutter_state_notifier.dart';
 import 'package:ossp_pickme/chatting/chat/chat_screen.dart';
+import 'package:ossp_pickme/comment/comment_repository.dart';
+import 'package:ossp_pickme/comment/comment_state.dart';
+import 'package:ossp_pickme/comment/user_provider.dart';
+import 'package:ossp_pickme/comment/user_state.dart';
 import 'package:ossp_pickme/pages/Chat_page.dart';
 import 'package:ossp_pickme/pages/Login_page.dart';
 import 'package:ossp_pickme/pages/MyInfo_page.dart';
@@ -8,6 +14,7 @@ import 'package:ossp_pickme/pages/Home_page.dart';
 import 'package:ossp_pickme/pages/Match_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'comment/comment_provider.dart';
 import 'firebase_options.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 
@@ -21,7 +28,25 @@ void main() async{
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<CommentRepository>(
+        create: (_) => CommentRepository(
+        firebaseFirestore: FirebaseFirestore.instance,
+        ),
+      ),
+      StateNotifierProvider<UserProvider, UserState>(
+          create: (context) => UserProvider(),
+        ),
+      StateNotifierProvider<CommentProvider, CommentState>(
+        create: (_) => CommentProvider(),
+      ),
+      ],
+      child: const MyApp(),
+      ),
+    );
+
 }
 
 class MyApp extends StatelessWidget {
@@ -50,6 +75,9 @@ class MyHomePage extends StatefulWidget {
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
+
+
+  
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -107,3 +135,4 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+

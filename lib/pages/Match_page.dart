@@ -94,6 +94,11 @@ class _MatchingState extends State<MatchingPage> {
       'accept': 0, // 초기값은 0
     };
 
+    // 매칭 정보 저장
+    FirebaseFirestore.instance.collection('matchingInfo').add({
+      'user1': currentUserInfo,
+    });
+
     // 1. 파이어베이스 탐색
     final matchingCollection = FirebaseFirestore.instance.collection('wait_Matching');
     final query = matchingCollection
@@ -145,6 +150,7 @@ class _MatchingState extends State<MatchingPage> {
         },
       });
       final matchingDocId = newDocRef.id;
+
       handleMatchCompletion(matchingDocId, context);
     }
   }
@@ -153,7 +159,6 @@ class _MatchingState extends State<MatchingPage> {
 
 ///***************************************************************************
   void handleMatchCompletion(String matchingDocId, BuildContext context) {
-    // 아래의 예시는 Timer를 사용하여 1초마다 Firebase 문서를 확인하고, user2.userId가 null이 아니면 다이얼로그를 띄우는 것입니다.
 
     Timer.periodic(Duration(seconds: 1), (timer) async {
       try {
@@ -175,7 +180,7 @@ class _MatchingState extends State<MatchingPage> {
           String chatRoomId = await createChatRoom(
             matchingDoc['user1']['userId'],
             matchingDoc['user2']['userId'],
-            matchingDoc['user1']['userId'], // 예시로 makerId에 user1의 ID를 사용
+            matchingDoc['user1']['userId'], // makerId 위치
           );
 
           showDialog(

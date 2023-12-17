@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ossp_pickme/menu/detail/bagel.dart';
 
 class etcFood extends StatefulWidget {
 const etcFood({Key? key}) : super(key: key);
@@ -26,7 +27,10 @@ children: <Widget>[
  title: Text('베이글'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => bagel(name: 'bagel')),
+                        );
  },
  ),
  ListTile(leading: Icon(Icons.food_bank),

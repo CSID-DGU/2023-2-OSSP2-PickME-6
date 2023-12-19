@@ -23,7 +23,7 @@ class MatchRecord extends StatelessWidget {
       ),
       body: FutureBuilder<QuerySnapshot>(
         // Firestore에서 데이터 가져오기
-        future: FirebaseFirestore.instance.collection('matchingInfo').get(),
+        future: FirebaseFirestore.instance.collection('matchingInfo').orderBy('timestamp', descending: true).get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return CircularProgressIndicator(); // 데이터 로딩 중일 때 표시할 UI

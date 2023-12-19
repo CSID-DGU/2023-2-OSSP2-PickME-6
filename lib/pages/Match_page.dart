@@ -97,8 +97,12 @@ class _MatchingState extends State<MatchingPage> {
       'accept': 0, // 초기값은 0
     };
 
+    // 현재 시간을 서버에서 생성된 타임스탬프로 얻기
+    FieldValue serverTimestamp = FieldValue.serverTimestamp();
+
     // 매칭 정보 저장
     FirebaseFirestore.instance.collection('matchingInfo').add({
+      'timestamp': serverTimestamp,
       'user1': currentUserInfo,
     });
 

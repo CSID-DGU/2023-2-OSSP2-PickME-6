@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'detail/comment_screen.dart';
+
 class Snack extends StatefulWidget {
 const Snack({Key? key}) : super(key: key);
 
@@ -26,49 +28,70 @@ children: <Widget>[
  title: Text('김밥'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => comment_screen(name: 'bagel')),
+                        );
  },
  ),
  ListTile(leading: Icon(Icons.food_bank),
  title: Text('라면'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => comment_screen(name: 'bagel')),
+                        );
  },
  ),
   ListTile(leading: Icon(Icons.food_bank),
  title: Text('순대'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => comment_screen(name: 'bagel')),
+                        );
  },
  ),
   ListTile(leading: Icon(Icons.food_bank),
  title: Text('튀김'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => comment_screen(name: 'bagel')),
+                        );
  },
  ),
   ListTile(leading: Icon(Icons.food_bank),
  title: Text('떡볶이'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => comment_screen(name: 'bagel')),
+                        );
  },
  ),
   ListTile(leading: Icon(Icons.food_bank),
  title: Text('쫄면'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => comment_screen(name: 'bagel')),
+                        );
  },
  ),
    ListTile(leading: Icon(Icons.food_bank),
  title: Text('기타 분식'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => comment_screen(name: 'bagel')),
+                        );
  },
  ),
 ],

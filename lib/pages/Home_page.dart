@@ -131,8 +131,8 @@ void handleSelection(FoodLabel selectedFood) {
           decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10.0),
           image: DecorationImage(
-            image: AssetImage(
-              'menu.png'
+            image: NetworkImage(
+              'https://cdn.pixabay.com/photo/2016/02/18/11/17/background-1206941_1280.jpg'
             ),
             fit: BoxFit.cover,
             )

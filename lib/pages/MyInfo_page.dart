@@ -1,12 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:ossp_pickme/pages/MatchRecord_page.dart';
 import 'package:ossp_pickme/pages/Login_page.dart';
 import 'package:ossp_pickme/pages/Inquiry_page.dart';
-import 'package:ossp_pickme/pages/ReviewManage_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:image_picker/image_picker.dart';
 import 'add_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ossp_pickme/pages/PointManage_page.dart';
@@ -71,7 +67,7 @@ class _MyInfoState extends State<MyInfoPage> {
   Widget _buildTop() {
     return Padding(
       padding: const EdgeInsets.only(top: 20, bottom: 20),
-      child: Column(
+      child: Stack(
         children: <Widget>[
           Positioned(
             child: Container(
@@ -256,141 +252,133 @@ class _MyInfoState extends State<MyInfoPage> {
   Widget _buildBottom() {
     return Column(
       children: [
-        Positioned(
-          child: InkWell(
-            onTap: () {
-              // 문의하기 버튼을 눌렀을 때 InquiryPage로 이동
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => InquiryPage()),
-              );
-            },
-            child: SizedBox(
-              width: 321,
-              height: 40,
-              child: Text(
-                '문의하기',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 15,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  height: 0,
-                  letterSpacing: -0.33,
-                ),
+        InkWell(
+          onTap: () {
+            // 문의하기 버튼을 눌렀을 때 InquiryPage로 이동
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => InquiryPage()),
+            );
+          },
+          child: SizedBox(
+            width: 321,
+            height: 40,
+            child: Text(
+              '문의하기',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 15,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                height: 0,
+                letterSpacing: -0.33,
               ),
             ),
           ),
         ),
-        Positioned(
-          child: InkWell(
-            onTap: () {
-              // 비밀번호 변경 버튼을 눌렀을 때 비밀번호 변경 창으로 이동
-              _showChangePasswordDialog();
-            },
-            child: SizedBox(
-              width: 321,
-              height: 40,
-              child: Text(
-                '비밀번호 변경',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 15,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  height: 0,
-                  letterSpacing: -0.33,
-                ),
+        SizedBox(height: 10),
+        InkWell(
+          onTap: () {
+            // 비밀번호 변경 버튼을 눌렀을 때 비밀번호 변경 창으로 이동
+            _showChangePasswordDialog();
+          },
+          child: SizedBox(
+            width: 321,
+            height: 40,
+            child: Text(
+              '비밀번호 변경',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 15,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                height: 0,
+                letterSpacing: -0.33,
               ),
             ),
           ),
         ),
-        Positioned(
-          child: InkWell(
-            onTap: () {
-              _showChangeProfileImageDialog(context);
-            },
-            child: SizedBox(
-              width: 321,
-              height: 40,
-              child: Text(
-                '프로필 이미지 변경',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 15,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  height: 0,
-                  letterSpacing: -0.33,
-                ),
+        SizedBox(height: 10),
+        InkWell(
+          onTap: () {
+            _showChangeProfileImageDialog(context);
+          },
+          child: SizedBox(
+            width: 321,
+            height: 40,
+            child: Text(
+              '프로필 이미지 변경',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 15,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                height: 0,
+                letterSpacing: -0.33,
               ),
             ),
           ),
         ),
-        Positioned(
-          child: InkWell(
-            onTap: () {
-              _showChangeNicknameDialog();
-            },
-            child: SizedBox(
-              width: 321,
-              height: 40,
-              child: Text(
-                '닉네임 설정',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 15,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  height: 0,
-                  letterSpacing: -0.33,
-                ),
+        SizedBox(height: 10),
+        InkWell(
+          onTap: () {
+            _showChangeNicknameDialog();
+          },
+          child: SizedBox(
+            width: 321,
+            height: 40,
+            child: Text(
+              '닉네임 설정',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 15,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                height: 0,
+                letterSpacing: -0.33,
               ),
             ),
           ),
         ),
-        Positioned(
-          child: InkWell(
-            onTap: () {
-              _authentication.signOut();
-              Navigator.pop(context);
-            },
-            child: SizedBox(
-              width: 321,
-              height: 40,
-              child: Text(
-                '로그아웃',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 15,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  height: 0,
-                  letterSpacing: -0.33,
-                ),
+        SizedBox(height: 10),
+        InkWell(
+          onTap: () {
+            _authentication.signOut();
+            Navigator.pop(context);
+          },
+          child: SizedBox(
+            width: 321,
+            height: 40,
+            child: Text(
+              '로그아웃',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 15,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                height: 0,
+                letterSpacing: -0.33,
               ),
             ),
           ),
         ),
-        Positioned(
-          child: InkWell(
-            onTap: () {
-              // 회원 탈퇴 팝업창 띄우기
-              _showConfirmationDialog();
-            },
-            child: SizedBox(
-              width: 321,
-              height: 40,
-              child: Text(
-                '회원탈퇴',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 15,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  height: 0,
-                  letterSpacing: -0.33,
-                ),
+        SizedBox(height: 10),
+        InkWell(
+          onTap: () {
+            _showConfirmationDialog();
+          },
+          child: SizedBox(
+            width: 321,
+            height: 40,
+            child: Text(
+              '회원탈퇴',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 15,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                height: 0,
+                letterSpacing: -0.33,
               ),
             ),
           ),
@@ -581,13 +569,13 @@ class _MyInfoState extends State<MyInfoPage> {
   // 이미지 변경
   void _showChangeProfileImageDialog(BuildContext context){
     showDialog(
-        context: context,
-        builder: (context){
-          return Dialog(
-            backgroundColor: Colors.white,
-            child: AddImage(),
-          );
-        },
+      context: context,
+      builder: (context){
+        return Dialog(
+          backgroundColor: Colors.white,
+          child: AddImage(),
+        );
+      },
     );
   }
 

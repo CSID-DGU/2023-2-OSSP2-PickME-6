@@ -56,7 +56,7 @@ class CommentRepository {
       DocumentReference<Map<String, dynamic>> writerDocRef =
       firebaseFirestore.collection('user').doc(nickName);
       DocumentReference<Map<String, dynamic>> feedDocRef =
-      firebaseFirestore.collection('menu_comment').doc(name);
+      firebaseFirestore.collection('menu_comment').doc('bagel');
       DocumentReference<Map<String, dynamic>> commentDocRef =
       feedDocRef.collection('comments').doc(commentId);
 

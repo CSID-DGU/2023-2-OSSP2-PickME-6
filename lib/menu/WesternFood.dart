@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'detail/comment_screen.dart';
+
 class WesternFood extends StatefulWidget {
 const WesternFood({Key? key}) : super(key: key);
 
@@ -26,28 +28,40 @@ children: <Widget>[
  title: Text('파스타'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => comment_screen(name: 'bagel')),
+                        );
  },
  ),
  ListTile(leading: Icon(Icons.food_bank),
  title: Text('피자'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => comment_screen(name: 'bagel')),
+                        );
  },
  ),
   ListTile(leading: Icon(Icons.food_bank),
  title: Text('햄버거'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => comment_screen(name: 'bagel')),
+                        );
  },
  ),
   ListTile(leading: Icon(Icons.food_bank),
  title: Text('기타 음식'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => comment_screen(name: 'bagel')),
+                        );
  },
  ),
 ],

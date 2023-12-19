@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ossp_pickme/menu/detail/bagel.dart';
+import 'package:ossp_pickme/menu/detail/comment_screen.dart';
 
 class etcFood extends StatefulWidget {
 const etcFood({Key? key}) : super(key: key);
@@ -29,7 +29,7 @@ children: <Widget>[
  onTap: () {
    Navigator.push(
                         context, 
-                        MaterialPageRoute(builder: (context) => bagel(name: 'bagel')),
+                        MaterialPageRoute(builder: (context) => comment_screen(name: 'bagel')),
                         );
  },
  ),
@@ -37,28 +37,40 @@ children: <Widget>[
  title: Text('샌드위치'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => comment_screen(name: 'bagel')),
+                        );
  },
  ),
   ListTile(leading: Icon(Icons.food_bank),
  title: Text('샐러드'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => comment_screen(name: 'bagel')),
+                        );
  },
  ),
   ListTile(leading: Icon(Icons.food_bank),
  title: Text('카페'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => comment_screen(name: 'bagel')),
+                        );
  },
  ),
   ListTile(leading: Icon(Icons.food_bank),
  title: Text('기타 음식'),
  trailing: Icon(Icons.navigate_next),
  onTap: () {
-   
+   Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (context) => comment_screen(name: 'bagel')),
+                        );
  },
  ),
 ],

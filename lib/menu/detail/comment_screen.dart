@@ -12,20 +12,20 @@ import 'package:provider/provider.dart';
 import 'package:ossp_pickme/comment/comment_card_widget.dart';
 
 
-class bagel extends StatefulWidget {
+class comment_screen extends StatefulWidget {
   final String name;
 
- const bagel({
+ const comment_screen({
   super.key,
   required this.name,
  });
   
   @override
-  State<bagel> createState() => _bagel();
+  State<comment_screen> createState() => _comment_screen();
 
 }
 
-class _bagel extends State<bagel> {
+class _comment_screen extends State<comment_screen> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _textEditingController = TextEditingController();
   late final CommentProvider commentProvider;
